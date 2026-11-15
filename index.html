@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Pencatat Keuangan</title>
+<script src="config.js"></script>
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#fff;--fg:#2C2C2A;--mut:#5F5E5A;--b:#185FA5;--bd:#0C447C;--bl:#B5D4F4;--bt:#E6F1FB;--card:#F4F7FB;--out:#A32D2D;--in:#3B6D11}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#14181F;--fg:#E8E8EA;--mut:#9AA3B2;--bl:#2A4468;--bt:#1B2A40;--card:#1C222C;--out:#F09595;--in:#97C459}}
@@ -65,6 +67,11 @@ nav button.on{color:#185FA5;font-weight:500}
 .pw{position:relative}.pw .in{padding-right:46px}
 .eye{position:absolute;right:4px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--mut);cursor:pointer;padding:9px;display:flex}
 .lnk{background:none;border:0;color:#378ADD;font:inherit;font-size:14px;cursor:pointer;margin-top:16px;text-decoration:underline}
+@media (min-width:520px){body{background:var(--card)}#app{background:var(--bg);min-height:100vh;box-shadow:0 0 0 1px var(--bl)}}
+nav{left:50%;right:auto;width:100%;max-width:480px;transform:translateX(-50%)}
+nav div{max-width:none}
+nav button b{display:flex}
+.in{font-size:16px}
 </style></head>
 <body>
 <div id="app"></div>
@@ -85,12 +92,13 @@ function pw(id,ph,extra){return '<div class="pw"><input class="in'+(extra||"")+'
 function mailLinks(){var s=encodeURIComponent("Lupa PIN Pencatat Keuangan"),b=encodeURIComponent("Halo, saya lupa PIN aplikasi Pencatat Keuangan. Mohon bantu reset PIN.");return{m:"mailto:"+S.email+"?subject="+s+"&body="+b,g:"https://mail.google.com/mail/?view=cm&to="+encodeURIComponent(S.email)+"&su="+s+"&body="+b}}
 function vForgot(){var l=mailLinks();return '<div class="pinbox"><div class="ttl2">Lupa PIN</div><p style="line-height:1.6">Silakan kirim pesan lupa password ke email<br><b>'+esc(S.email)+'</b></p><a class="btn" style="text-decoration:none;box-sizing:border-box" href="'+esc(l.m)+'" target="_blank" rel="noopener">Buka aplikasi email</a><a class="btn sec" style="text-decoration:none;box-sizing:border-box" href="'+esc(l.g)+'" target="_blank" rel="noopener">Buka Gmail di tab baru</a><button class="lnk" data-a="back">Kembali</button></div>'}
 var PIN="";
-var API_URL="https://script.google.com/macros/s/AKfycbyPYWtptflCNKmZQj0g-9UwJyJAPbcqaNG8DHOh-PquF3OMS4ujYEARL0355HViBuMxkw/exec";
+var API_URL=window.API_URL||"";
 function call(fn){var a=[].slice.call(arguments,1);
   if(API_URL){
     if(API_URL.indexOf("https://")!==0)return Promise.reject(new Error("NOURL"));
     return fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({fn:fn,args:fn==="api_info"?[]:[PIN].concat(a)})}).then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.error);return j.data});
   }
+  if(!(window.google&&google.script&&google.script.run))return Promise.reject(new Error("NOURL"));
   return new Promise(function(res,rej){google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn].apply(null,[PIN].concat(a))})}
 function msg(e){var m=(e&&e.message)||"";if(m.indexOf("BADPIN")>=0)return "PIN salah.";if(m.indexOf("LOCKED")>=0)return "Terlalu banyak percobaan. Coba lagi 10 menit lagi.";if(m.indexOf("NOURL")>=0)return "Alamat Apps Script belum diisi di index.html.";if(m.indexOf("NOPIN")>=0)return "PIN belum diatur di Apps Script. Lihat panduan.";return "Tidak bisa terhubung ke server. Coba lagi."}
 function vPin(){return '<div class="pinbox"><div class="ic" style="width:64px;height:64px;font-size:30px;margin:0 auto 16px;background:#185FA5">🔒</div><div class="ttl2">Pencatat Keuangan</div>'+pw("pin","PIN"," pin")+'<label class="rem"><input type="checkbox" id="rem" '+(S.rem?"checked":"")+'> Ingat PIN di perangkat ini</label><div class="err2">'+esc(S.pinErr)+'</div><button class="btn" data-a="login">'+(S.loading?"Memeriksa…":"Masuk")+'</button><button class="lnk" data-a="forgot">Lupa PIN?</button></div>'}
@@ -175,7 +183,7 @@ function render(){
   if(!S.auth){app.innerHTML=S.forgot?vForgot():vPin();navEl.innerHTML="";return}
   var v=S.tab==="catat"?vCatat():S.tab==="riwayat"?vRiwayat():S.tab==="setelan"?vSetelan():vRingkas();
   app.innerHTML=(S.dbErr?'<div class="warn">Perubahan terakhir belum tersimpan ke server. Periksa koneksi, lalu muat ulang halaman.</div>':"")+v;
-  var T=[["catat","＋","Catat"],["riwayat","☰","Riwayat"],["ringkas","◔","Ringkasan"],["setelan","⚙","Setelan"]];
+  var T=[["catat",'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',"Catat"],["riwayat",'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14"/></svg>',"Riwayat"],["ringkas",'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg>',"Ringkasan"],["setelan",'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>',"Setelan"]];
   navEl.innerHTML=T.map(function(t){return '<button class="'+(S.tab===t[0]?"on":"")+'" data-t="'+t[0]+'"><b>'+t[1]+'</b>'+t[2]+'</button>'}).join("");
 }
 navEl.onclick=function(e){var t=e.target.closest("[data-t]");if(!t)return;S.tab=t.dataset.t;S.del=null;fixKat();S.msg="";S.err="";render();window.scrollTo(0,0)};
