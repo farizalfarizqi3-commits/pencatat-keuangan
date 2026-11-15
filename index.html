@@ -26,9 +26,9 @@ body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 system-ui,-appl
 .pill.on{background:#fff;color:#0C447C;font-weight:500}
 .bd{padding:6px 18px 18px}
 .lab{font-size:12px;color:var(--mut);margin:16px 0 6px}
-.chips{display:flex;gap:6px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
 .chip,.cat{border:1px solid var(--bl);background:var(--bg);color:var(--fg);border-radius:12px;font:inherit;cursor:pointer}
-.chip{flex:1;padding:10px 4px}
+.chip{flex:1 1 28%;padding:10px 4px}
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .cat{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 2px;font-size:12px}
 .cat b{font-size:20px;line-height:1}
@@ -75,6 +75,7 @@ nav{left:50%;right:auto;width:100%;max-width:480px;transform:translateX(-50%)}
 nav div{max-width:none}
 nav button b{display:flex}
 .in{font-size:16px}
+.topbtn{display:flex;align-items:center;gap:6px;border:0;background:#378ADD;color:#fff;border-radius:16px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
 </style></head>
 <body>
 <div id="app"></div>
@@ -82,10 +83,13 @@ nav button b{display:flex}
 <script>
 var KAT={out:[["Makan","🍽"],["Transport","🚌"],["Belanja","🛍"],["Tagihan","🧾"],["Kesehatan","❤"],["Lainnya","⋯"]],in:[["Gaji","💰"],["Bonus","🎁"],["Lainnya","⋯"]]};
 var AKUN=["Cash","Bank","E-wallet"];
-KAT={out:KAT.out.map(function(k){return{n:k[0],i:k[1],b:0}}),in:KAT.in.map(function(k){return{n:k[0],i:k[1],b:0}})};
+KAT={out:KAT.out.map(function(k){return{n:k[0],i:k[1],b:0}}),in:KAT.in.map(function(k){return{n:k[0],i:k[1],b:0}}),akun:AKUN.map(function(n){return{n:n,i:"",b:0}})};
+var LIM={akun:5,out:10,in:5};
+function akunList(){return KAT.akun.map(function(k){return k.n})}
+function dupBad(){return["akun","out","in"].some(function(j){var seen={};return KAT[j].some(function(k){var n=k.n.trim().toLowerCase();if(!n||seen[n])return true;seen[n]=1;return false})})}
 var cfgT=null;
-function saveCfg(){clearTimeout(cfgT);cfgT=setTimeout(function(){call("api_saveCfg",{out:KAT.out,in:KAT.in}).catch(function(e){S.dbErr=true;render()})},600)}
-function fixKat(){var a=KAT[S.jenis];if(!a.some(function(k){return k.n===S.kat}))S.kat=a.length?a[0].n:""}
+function saveCfg(){clearTimeout(cfgT);cfgT=setTimeout(function(){call("api_saveCfg",{out:KAT.out,in:KAT.in,akun:KAT.akun}).catch(function(e){S.dbErr=true;render()})},600)}
+function fixKat(){var a=KAT[S.jenis];if(!a.some(function(k){return k.n===S.kat}))S.kat=a.length?a[0].n:"";if(!KAT.akun.some(function(k){return k.n===S.akun}))S.akun=KAT.akun.length?KAT.akun[0].n:""}
 function pad(n){return n<10?"0"+n:""+n}
 function today(){var d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
 var S={email:"muhammadalfarizqi13@gmail.com",forgot:false,auth:false,loading:false,pinErr:"",rem:true,auto:false,last:"",busy:"",bmsg:"",pmsg:"",tx:[],jenis:"out",akun:"Cash",kat:"Makan",nom:"",ket:"",tgl:today(),tab:"catat",bulan:today().slice(0,7),del:null,dbErr:false,msg:"",err:""};
@@ -108,7 +112,7 @@ function vPin(){return '<div class="pinbox"><div class="ic" style="width:64px;he
 function doLogin(silent){
   S.loading=true;S.pinErr="";render();
   call("api_load").then(function(d){
-    S.tx=d.tx||[];if(d.cfg&&d.cfg.out&&d.cfg.in){KAT.out=d.cfg.out;KAT.in=d.cfg.in}
+    S.tx=d.tx||[];if(d.cfg&&d.cfg.out&&d.cfg.in){KAT.out=d.cfg.out.slice(0,LIM.out);KAT.in=d.cfg.in.slice(0,LIM.in);if(d.cfg.akun&&d.cfg.akun.length)KAT.akun=d.cfg.akun.slice(0,LIM.akun)}
     S.auto=!!d.auto;S.last=d.last||"";S.auth=true;S.loading=false;fixKat();
     try{if(S.rem)localStorage.setItem("pk_pin",PIN);else localStorage.removeItem("pk_pin")}catch(x){}
     render();
@@ -124,13 +128,15 @@ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;
 function ico(k){var a=KAT.out.concat(KAT.in);for(var i=0;i<a.length;i++)if(a[i].n===k)return a[i].i;return "⋯"}
 function tglFmt(t){return new Date(t+"T00:00").toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"})}
 function blnFmt(b){return new Date(b+"-01T00:00").toLocaleDateString("id-ID",{month:"long",year:"numeric"})}
-function hd(title,extra){return '<div class="hd"><div class="top"><span>Pencatat Keuangan</span><span>'+tglFmt(today())+'</span></div><div class="ttl">'+title+'</div>'+(extra||"")+'</div>'}
+var GEAR='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>';
+var BACK='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
+function hd(title,extra,left){return '<div class="hd"><div class="top">'+(left||'<button class="topbtn" data-a="kelola">'+GEAR+'Akun dan kategori</button>')+'<span>'+tglFmt(today())+'</span></div><div class="ttl">'+title+'</div>'+(extra||"")+'</div>'}
 function monthInput(){return '<input class="mon" type="month" id="bln" value="'+S.bulan+'">'}
 function vCatat(){
   var h=hd("Catat transaksi",
     '<div class="big"><span>Rp</span><input id="nom" inputmode="numeric" placeholder="0" value="'+S.nom+'" autocomplete="off"></div><div class="err">'+S.err+'</div>'+
     '<div class="pills"><button class="pill'+(S.jenis==="out"?" on":"")+'" data-a="jenis" data-v="out">Pengeluaran</button><button class="pill'+(S.jenis==="in"?" on":"")+'" data-a="jenis" data-v="in">Pemasukan</button></div>');
-  var b='<div class="bd"><div class="lab">Akun</div><div class="chips">'+AKUN.map(function(a){return '<button class="chip'+(S.akun===a?" on":"")+'" data-a="akun" data-v="'+a+'">'+a+'</button>'}).join("")+'</div>'+
+  var b='<div class="bd"><div class="lab">Akun</div><div class="chips">'+akunList().map(function(a){return '<button class="chip'+(S.akun===a?" on":"")+'" data-a="akun" data-v="'+esc(a)+'">'+esc(a)+'</button>'}).join("")+'</div>'+
     '<div class="lab">Kategori</div><div class="grid">'+(KAT[S.jenis].length?KAT[S.jenis].map(function(k){return '<button class="cat'+(S.kat===k.n?" on":"")+'" data-a="kat" data-v="'+esc(k.n)+'"><b>'+esc(k.i)+'</b>'+esc(k.n)+'</button>'}).join(""):'<div class="empty" style="grid-column:1/-1;padding:12px 0">Belum ada kategori. Tambahkan di Setelan.</div>')+'</div>'+budgetHint()+
     '<div class="lab">Keterangan</div><input class="in" id="ket" placeholder="Opsional, misalnya makan siang" value="'+esc(S.ket)+'">'+
     '<div class="lab">Tanggal</div><input class="in" type="date" id="tgl" value="'+S.tgl+'">'+
@@ -160,33 +166,42 @@ function vRingkas(){
   KAT.out.forEach(function(k){if(k.b&&m[k.n]===undefined)m[k.n]=0});var ks=Object.keys(m).sort(function(a,c){return m[c]-m[a]});
   b+='<div class="lab">Pengeluaran dan anggaran per kategori</div>';
   b+=ks.length?ks.map(function(k){var bg=budOf(k),ov=bg&&m[k]>bg,pc=bg?Math.min(100,Math.round(m[k]/bg*100)):Math.min(100,Math.round(m[k]/Math.max(1,sum(l,"out"))*100));return '<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between"><span>'+ico(k)+" "+esc(k)+'</span><span>'+rp(m[k])+(bg?' / '+rp(bg):'')+'</span></div><div class="bar"><i style="width:'+pc+'%'+(ov?';background:var(--out)':'')+'"></i></div>'+(bg?'<small style="color:var(--'+(ov?'out':'mut')+')">'+(ov?'Melebihi '+rp(m[k]-bg):'Sisa '+rp(bg-m[k]))+'</small>':'')+'</div>'}).join(""):'<div class="empty">Belum ada pengeluaran bulan ini.</div>';
-  b+='<div class="lab">Saldo per akun</div><div class="cards" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-top:0">'+AKUN.map(function(a){var x=all.filter(function(t){return t.akun===a});var s=sum(x,"in")-sum(x,"out");return '<div class="card"><small>'+a+'</small><strong style="font-size:14px">'+(s<0?"−":"")+rp(Math.abs(s))+'</strong></div>'}).join("")+'</div></div>';
+  b+='<div class="lab">Saldo per akun</div><div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(104px,1fr));margin-top:0">'+akunList().map(function(a){var x=all.filter(function(t){return t.akun===a});var s=sum(x,"in")-sum(x,"out");return '<div class="card"><small>'+esc(a)+'</small><strong style="font-size:14px">'+(s<0?"−":"")+rp(Math.abs(s))+'</strong></div>'}).join("")+'</div></div>';
   return h+b;
 }
 function budOf(n){var a=KAT.out;for(var i=0;i<a.length;i++)if(a[i].n===n)return a[i].b||0;return 0}
 function spent(k,bln){return S.tx.filter(function(t){return t.jenis==="out"&&t.kat===k&&t.tgl.slice(0,7)===bln}).reduce(function(s,t){return s+t.nom},0)}
 function budgetHint(){if(S.jenis!=="out"||!S.kat)return "";var bg=budOf(S.kat);if(!bg)return "";var sp=spent(S.kat,S.tgl.slice(0,7)),ov=sp>bg;return '<div style="font-size:13px;margin-top:8px;color:var(--'+(ov?"out":"mut")+')">Anggaran '+esc(S.kat)+': terpakai '+rp(sp)+' dari '+rp(bg)+(ov?' (melebihi '+rp(sp-bg)+')':' · sisa '+rp(bg-sp))+'</div>'}
 function vSetelan(){
-  var h=hd("Setelan",'<div style="font-size:13px;color:#B5D4F4;margin-top:4px">Kelola kategori dan anggaran bulanan</div>');
+  var h=hd("Setelan",'<div style="font-size:13px;color:#B5D4F4;margin-top:4px">Cadangan dan keamanan</div>');
   var b='<div class="bd">';
-  ["out","in"].forEach(function(j){
-    b+='<div class="lab">'+(j==="out"?"Kategori pengeluaran dan anggaran per bulan (kosongkan jika tanpa anggaran)":"Kategori pemasukan")+'</div>';
-    KAT[j].forEach(function(k,i){
-      var id=j+"|"+i;
-      b+='<div class="krow"><input class="in ic2" data-c="'+id+'|i" value="'+esc(k.i)+'" maxlength="2" aria-label="Ikon"><input class="in" data-c="'+id+'|n" value="'+esc(k.n)+'" aria-label="Nama kategori">'+(j==="out"?'<input class="in bg" inputmode="numeric" placeholder="Anggaran" data-c="'+id+'|b" value="'+(k.b?k.b.toLocaleString("id-ID"):"")+'" aria-label="Anggaran">':'')+'<button class="x" data-a="delkat" data-v="'+id+'">'+(S.del===id?"Hapus?":"Hapus")+'</button></div>';
-    });
-    b+='<button class="btn sec" data-a="addkat" data-v="'+j+'">Tambah kategori</button>';
-  });
+  b+='<button class="btn sec" style="margin-top:4px" data-a="kelola">Kelola akun dan kategori</button>';
   b+='<div class="lab">Cadangan ke Google Drive</div><div class="chips"><button class="chip'+(S.auto?" on":"")+'" data-a="auto" data-v="1">Otomatis tiap bulan</button><button class="chip'+(!S.auto?" on":"")+'" data-a="auto" data-v="0">Manual saja</button></div><button class="btn sec" data-a="backup">'+(S.busy==="backup"?"Mencadangkan…":"Cadangkan sekarang")+'</button><div class="note" style="margin-top:8px">'+(S.last?"Cadangan terakhir: "+esc(S.last)+".":"Belum pernah dicadangkan.")+(S.auto?" Cadangan otomatis dibuat tiap tanggal 1.":"")+'</div><div class="ok">'+esc(S.bmsg)+'</div>';
   b+='<div class="lab">Keamanan</div>'+pw("opin","PIN lama")+'<div style="height:8px"></div>'+pw("npin","PIN baru (4 sampai 12 angka)")+'<div style="height:8px"></div>'+pw("npin2","Ulangi PIN baru")+'<button class="btn sec" data-a="chpin">Ganti PIN</button><div class="ok">'+esc(S.pmsg)+'</div><button class="btn sec" data-a="lock">Kunci aplikasi</button>';
-  b+='<div class="note">Perubahan tersimpan otomatis. Mengganti nama kategori tidak mengubah transaksi lama, dan menghapus kategori tidak menghapus transaksinya.</div></div>';
+  b+='<div class="note">Perubahan tersimpan otomatis.</div></div>';
+  return h+b;
+}
+function vKelola(){
+  var h=hd("Akun dan kategori",'<div style="font-size:13px;color:#B5D4F4;margin-top:4px">Perubahan tersimpan otomatis</div>','<button class="topbtn" data-a="tutup">'+BACK+'Kembali</button>');
+  var b='<div class="bd">';
+  [["akun","Akun (maksimal 5)"],["out","Kategori pengeluaran dan anggaran per bulan (maksimal 10, anggaran boleh kosong)"],["in","Kategori pemasukan (maksimal 5)"]].forEach(function(g){
+    var j=g[0],n=KAT[j].length;
+    b+='<div class="lab">'+g[1]+' · '+n+'/'+LIM[j]+'</div>';
+    KAT[j].forEach(function(k,i){
+      var id=j+"|"+i;
+      b+='<div class="krow">'+(j==="akun"?'':'<input class="in ic2" data-c="'+id+'|i" value="'+esc(k.i)+'" maxlength="2" aria-label="Ikon">')+'<input class="in" data-c="'+id+'|n" value="'+esc(k.n)+'" aria-label="Nama">'+(j==="out"?'<input class="in bg" inputmode="numeric" placeholder="Anggaran" data-c="'+id+'|b" value="'+(k.b?k.b.toLocaleString("id-ID"):"")+'" aria-label="Anggaran">':'')+'<button class="x" data-a="delkat" data-v="'+id+'">'+(S.del===id?"Hapus?":"Hapus")+'</button></div>';
+    });
+    b+=n>=LIM[j]?'<div class="note">Batas '+LIM[j]+' sudah tercapai. Hapus satu untuk menambah.</div>':'<button class="btn sec" data-a="addkat" data-v="'+j+'">Tambah '+(j==="akun"?"akun":"kategori")+'</button>';
+  });
+  b+='<div class="note">Mengganti nama akun atau kategori tidak mengubah transaksi lama, dan menghapusnya tidak menghapus transaksinya.</div><div class="err2" style="text-align:left">'+esc(S.kmsg||"")+'</div></div>';
   return h+b;
 }
 function render(){
   if(!S.auth){app.innerHTML=S.forgot?vForgot():vPin();navEl.innerHTML="";return}
-  var v=S.tab==="catat"?vCatat():S.tab==="riwayat"?vRiwayat():S.tab==="setelan"?vSetelan():vRingkas();
+  var v=S.tab==="catat"?vCatat():S.tab==="riwayat"?vRiwayat():S.tab==="setelan"?vSetelan():S.tab==="kelola"?vKelola():vRingkas();
   app.innerHTML=(S.dbErr?'<div class="warn">Perubahan terakhir belum tersimpan ke server. Periksa koneksi, lalu muat ulang halaman.</div>':"")+v;
   var T=[["catat",'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',"Catat"],["riwayat",'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14"/></svg>',"Riwayat"],["ringkas",'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg>',"Ringkasan"],["setelan",'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>',"Setelan"]];
+  navEl.parentNode.style.display=S.tab==="kelola"?"none":"";
   navEl.innerHTML=T.map(function(t){return '<button class="'+(S.tab===t[0]?"on":"")+'" data-t="'+t[0]+'"><b>'+t[1]+'</b>'+t[2]+'</button>'}).join("");
 }
 navEl.onclick=function(e){var t=e.target.closest("[data-t]");if(!t)return;S.tab=t.dataset.t;S.del=null;fixKat();S.msg="";S.err="";render();window.scrollTo(0,0)};
@@ -220,8 +235,10 @@ app.onclick=function(e){
     S.pmsg="Memproses…";render();
     call("api_changePin",op,np).then(function(){PIN=np;try{if(S.rem)localStorage.setItem("pk_pin",np)}catch(x){}S.pmsg="PIN diganti."}).catch(function(e){S.pmsg=(e&&e.message||"").indexOf("BADPIN")>=0?"PIN lama salah.":msg(e)}).then(function(){render()})}
   else if(a==="lock"){PIN="";S.auth=false;S.tx=[];try{localStorage.removeItem("pk_pin")}catch(x){}render()}
-  else if(a==="addkat"){KAT[v].push({n:"Baru",i:"•",b:0});fixKat();saveCfg();render()}
-  else if(a==="delkat"){if(S.del===v){var p=v.split("|");KAT[p[0]].splice(Number(p[1]),1);S.del=null;fixKat();saveCfg();render()}else{S.del=v;render()}}
+  else if(a==="addkat"){if(KAT[v].length>=LIM[v]){S.kmsg="Batas "+LIM[v]+" sudah tercapai.";render();return}KAT[v].push({n:"Baru",i:v==="akun"?"":"•",b:0});S.kmsg="";fixKat();saveCfg();render()}
+  else if(a==="kelola"){if(S.tab!=="kelola")S.prev=S.tab;S.tab="kelola";S.del=null;S.kmsg="";render();window.scrollTo(0,0)}
+  else if(a==="tutup"){if(dupBad()){S.kmsg="Nama tidak boleh kosong atau kembar dalam satu daftar.";render();return}["akun","out","in"].forEach(function(j){KAT[j].forEach(function(k){k.n=k.n.trim()})});saveCfg();S.tab=S.prev||"catat";S.del=null;S.kmsg="";fixKat();render();window.scrollTo(0,0)}
+  else if(a==="delkat"){if(S.del===v){var p=v.split("|");if(p[0]==="akun"&&KAT.akun.length<=1){S.del=null;S.kmsg="Minimal harus ada satu akun.";render();return}KAT[p[0]].splice(Number(p[1]),1);S.del=null;S.kmsg="";fixKat();saveCfg();render()}else{S.del=v;S.kmsg="";render()}}
 };
 function simpan(){
   var n=Number(S.nom.replace(/\D/g,""));
