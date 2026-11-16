@@ -110,7 +110,7 @@ if(!KAT.akun.some(function(k){return k.n===S.akun}))S.akun=KAT.akun.length?KAT.a
 if(S.akunTo===S.akun||!KAT.akun.some(function(k){return k.n===S.akunTo})){var o=KAT.akun.filter(function(k){return k.n!==S.akun})[0];S.akunTo=o?o.n:""}}
 function pad(n){return n<10?"0"+n:""+n}
 function today(){var d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
-var S={fKat:"semua",akunTo:"",fee:"",log:[],qR:"",qU:"",qA:"",open:{},ac:null,dl:"",dlBusy:false,fU:"semua",fA:"semua",utang:[],aset:[],fu:null,fa:null,pay:"",act:null,ferr:"",selDay:today(),email:"muhammadalfarizqi13@gmail.com",forgot:false,auth:false,loading:false,pinErr:"",rem:false,autoDay:1,rsBk:true,rsAsk:false,rmsg:"",orAsk:false,omsg:"",hide:{u_lunas:true,a_tercapai:true},auto:false,last:"",busy:"",bmsg:"",pmsg:"",tx:[],jenis:"out",akun:"Cash",kat:"Makan",nom:"",ket:"",tgl:today(),tab:"catat",bulan:today().slice(0,7),del:null,dbErr:false,msg:"",err:""};
+var S={tg:{on:false,bot:"",kode:"",jam:7,subs:0,nom:true},tmsg:"",fKat:"semua",akunTo:"",fee:"",log:[],qR:"",qU:"",qA:"",open:{},ac:null,dl:"",dlBusy:false,fU:"semua",fA:"semua",utang:[],aset:[],fu:null,fa:null,pay:"",act:null,ferr:"",selDay:today(),email:"muhammadalfarizqi13@gmail.com",forgot:false,auth:false,loading:false,pinErr:"",rem:false,autoDay:1,rsBk:true,rsAsk:false,rmsg:"",orAsk:false,omsg:"",hide:{u_lunas:true,a_tercapai:true},auto:false,last:"",busy:"",bmsg:"",pmsg:"",tx:[],jenis:"out",akun:"Cash",kat:"Makan",nom:"",ket:"",tgl:today(),tab:"catat",bulan:today().slice(0,7),del:null,dbErr:false,msg:"",err:""};
 var EYE='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 var EYEOFF='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.1 6.1C3.6 7.8 2 12 2 12s3.6 7 10 7c1.7 0 3.2-.4 4.5-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
 function pw(id,ph,extra){return '<div class="pw"><input class="in'+(extra||"")+'" id="'+id+'" type="password" inputmode="numeric" maxlength="12" placeholder="'+ph+'" autocomplete="off"><button class="eye" type="button" data-a="eye" data-v="'+id+'" aria-label="Tampilkan PIN">'+EYE+'</button></div>'}
@@ -125,13 +125,13 @@ function call(fn){var a=[].slice.call(arguments,1);
   }
   if(!(window.google&&google.script&&google.script.run))return Promise.reject(new Error("NOURL"));
   return new Promise(function(res,rej){google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn].apply(null,[PIN].concat(a))})}
-function msg(e){var m=(e&&e.message)||"";if(m.indexOf("BADPIN")>=0)return "PIN salah.";if(m.indexOf("LOCKED")>=0)return "Terlalu banyak percobaan. Coba lagi 10 menit lagi.";if(m.indexOf("NOURL")>=0)return "Alamat Apps Script belum diisi di index.html.";if(m.indexOf("NOPIN")>=0)return "PIN belum diatur di Apps Script. Lihat panduan.";return "Tidak bisa terhubung ke server. Coba lagi."}
+function msg(e){var m=(e&&e.message)||"";if(m.indexOf("BADPIN")>=0)return "PIN salah.";if(m.indexOf("LOCKED")>=0)return "Terlalu banyak percobaan. Coba lagi 10 menit lagi.";if(m.indexOf("NOURL")>=0)return "Alamat Apps Script belum diisi di index.html.";if(m.indexOf("NOPIN")>=0)return "PIN belum diatur di Apps Script. Lihat panduan.";if(m.indexOf("NOTOKEN")>=0)return "Token bot Telegram belum diatur. Tambahkan properti TG_TOKEN di Script Properties.";if(m.indexOf("TG:")>=0)return "Telegram menolak: "+m.slice(m.indexOf("TG:")+3);return "Tidak bisa terhubung ke server. Coba lagi."}
 function vPin(){return '<div class="pinbox"><div class="ic" style="width:64px;height:64px;font-size:30px;margin:0 auto 16px;background:#185FA5">🔒</div><div class="ttl2">Pencatat Keuangan</div>'+pw("pin","PIN"," pin")+'<label class="rem"><input type="checkbox" id="rem" '+(S.rem?"checked":"")+'> Ingat PIN di perangkat ini</label><div class="err2">'+esc(S.pinErr)+'</div><button class="btn" data-a="login">'+(S.loading?"Memeriksa…":"Masuk")+'</button><button class="lnk" data-a="forgot">Lupa PIN?</button></div>'}
 function doLogin(silent){
   S.loading=true;S.pinErr="";render();
   call("api_load").then(function(d){
     S.tx=d.tx||[];S.utang=d.utang||[];S.aset=d.aset||[];S.log=d.log||[];if(d.cfg&&d.cfg.out&&d.cfg.in){KAT.out=d.cfg.out.slice(0,LIM.out);KAT.in=d.cfg.in.slice(0,LIM.in);if(d.cfg.akun&&d.cfg.akun.length)KAT.akun=d.cfg.akun.slice(0,LIM.akun)}
-    S.auto=!!d.auto;S.autoDay=d.autoDay||1;S.last=d.last||"";S.auth=true;S.loading=false;fixKat();
+    S.tg=d.tg||S.tg;S.auto=!!d.auto;S.autoDay=d.autoDay||1;S.last=d.last||"";S.auth=true;S.loading=false;fixKat();
     try{if(S.rem)localStorage.setItem("pk_pin",PIN);else localStorage.removeItem("pk_pin")}catch(x){}
     render();
   }).catch(function(e){
@@ -216,6 +216,7 @@ function vSetelan(){
   b+='<div class="lab">Cadangan ke Google Drive</div><div class="chips"><button class="chip'+(S.auto?" on":"")+'" data-a="auto" data-v="1">Otomatis tiap bulan</button><button class="chip'+(!S.auto?" on":"")+'" data-a="auto" data-v="0">Manual saja</button></div>'+
     (S.auto?'<div class="lab">Dibuat tiap tanggal (1 sampai 28)</div><div class="krow"><input class="in" id="ad" type="number" inputmode="numeric" min="1" max="28" value="'+S.autoDay+'" aria-label="Tanggal cadangan"><button class="mini on" data-a="autoday">Terapkan</button></div>':'')+
     '<button class="btn sec" data-a="backup">'+(S.busy==="backup"?"Mencadangkan…":"Cadangkan sekarang")+'</button><div class="note" style="margin-top:8px">'+(S.last?"Cadangan terakhir: "+esc(S.last)+".":"Belum pernah dicadangkan.")+(S.auto?" Cadangan otomatis dibuat tiap tanggal "+S.autoDay+" sekitar pukul 02.00.":"")+'</div><div class="ok">'+esc(S.bmsg)+'</div>';
+  b+=tgSect();
   b+='<div class="lab">Unduh ke perangkat ini</div><button class="btn sec" style="margin-top:0" data-a="dl">'+(S.dlBusy?"Menyiapkan file…":"Unduh cadangan (Excel)")+'</button><div class="note" style="margin-top:8px">File .xlsx berisi transaksi, utang dan tagihan, tabungan dan investasi, riwayat catatan, serta akun dan kategori. Tersimpan di folder Unduhan perangkat yang kamu pakai sekarang. File ini tidak dikunci PIN, jadi simpan dengan hati-hati.</div><div class="ok">'+esc(S.dl)+'</div>';
   var orp=S.tx.filter(function(t){return (t.src==="utang"||t.src==="aset")&&!hasLog(t.ref)});
   if(orp.length||S.omsg){var net=orp.reduce(function(s,t){return s+(t.jenis==="in"?t.nom:-t.nom)},0);
@@ -283,6 +284,24 @@ function xinput(e){var el=e.target,f=el.dataset.f;
   if(el.id==="q_u"){S.qU=el.value;document.getElementById("lst").innerHTML=listU();return true}
   if(el.id==="q_a"){S.qA=el.value;document.getElementById("lst").innerHTML=listA();return true}
   if(!f&&!el.dataset.num)return false;if(el.dataset.num)fmtIn(el);if(f){var p=f.split("."),o=S[p[0]];if(o)o[p[1]]=el.value;S.ferr=""}return true}
+function addUnit(t,u,k){var p=t.split("-").map(Number),y=p[0],m=p[1]-1,d=p[2];if(u==="mingguan"){var x=new Date(y,m,d+7*k);return x.getFullYear()+"-"+pad(x.getMonth()+1)+"-"+pad(x.getDate())}var mm=u==="tahunan"?m+12*k:m+k,yy=y+Math.floor(mm/12),mo=((mm%12)+12)%12,last=new Date(yy,mo+1,0).getDate();return yy+"-"+pad(mo+1)+"-"+pad(Math.min(d,last))}
+function nextOcc(t,u){if(!t||!u)return t||"";for(var k=0;k<2000;k++){var x=addUnit(t,u,k);if(x>=today())return x}return t}
+var INGL={"0":"Hari H","1":"H-1","3":"H-3"};
+function ingTxt(s){return String(s||"").split(",").filter(Boolean).map(function(k){return INGL[k]}).join(", ")}
+function ingRow(o){var cur=(S[o].ingat||"").split(",");return '<div class="lab">Pengingat Telegram (opsional)</div><div class="chips">'+["0","1","3"].map(function(k){return '<button class="chip'+(cur.indexOf(k)>=0?" on":"")+'" data-a="ing" data-v="'+o+'|'+k+'">'+INGL[k]+'</button>'}).join("")+'</div>'+(S.tg.on?'':'<div class="note" style="margin-top:6px">Aktifkan pengingat Telegram di Pengaturan agar pesan terkirim.</div>')}
+function tgOpt(k,v,ok){S.tmsg="Memproses…";render();call("api_tgOpt",k,v).then(function(r){S.tg=r;S.tmsg=ok}).catch(function(e){S.tmsg=msg(e)}).then(function(){render()})}
+function tgSect(){
+  var t=S.tg,lk=t.bot?"https://t.me/"+t.bot+(t.kode?"?start="+t.kode:""):"";
+  var b='<div class="lab">Pengingat Telegram</div><div class="chips"><button class="chip'+(t.on?" on":"")+'" data-a="tg_on" data-v="1">Aktif</button><button class="chip'+(!t.on?" on":"")+'" data-a="tg_on" data-v="0">Mati</button></div>';
+  if(t.on){
+    b+='<div class="note" style="margin-top:8px">Bot mengirim pengingat ke semua pengikutnya sesuai pilihan pada tiap utang, piutang, tagihan, tabungan, dan investasi (hari H, H-1, H-3). Yang sudah telat tidak dikirim. Hanya yang memakai tautan di bawah yang bisa ikut. Ganti kode jika tautan sudah tersebar.</div>';
+    b+='<div class="card" style="margin-top:10px"><small>Tautan undangan bot</small><div style="word-break:break-all;font-size:13px;margin:4px 0">'+esc(lk)+'</div><div class="acts"><a class="mini on" style="text-decoration:none" href="'+esc(lk)+'" target="_blank" rel="noopener">Buka bot</a><button class="mini" data-a="tg_copy" data-v="'+esc(lk)+'">Salin tautan</button></div><small style="margin-top:8px">'+t.subs+' pengikut</small></div>';
+    b+='<div class="lab">Jam pengiriman (WIB, 0 sampai 23)</div><div class="krow"><input class="in" id="tgj" type="number" inputmode="numeric" min="0" max="23" value="'+t.jam+'" aria-label="Jam pengiriman"><button class="mini on" data-a="tg_jam">Terapkan</button></div>';
+    b+='<div class="chips" style="margin-top:10px"><button class="chip'+(t.nom?" on":"")+'" data-a="tg_nom">Tampilkan nominal di pesan</button></div>';
+    b+='<div class="acts"><button class="mini" data-a="tg_test">Kirim pesan tes</button><button class="mini" data-a="tg_kode">'+(S.del==="tgkode"?"Ganti kode?":"Ganti kode undangan")+'</button><button class="mini" data-a="tg_clear">'+(S.del==="tgclear"?"Hapus semua?":"Hapus semua pengikut")+'</button></div>';
+  }
+  return b+'<div class="ok">'+esc(S.tmsg)+'</div>';
+}
 function linkRow(o,note){var f=S[o];
   return '<div class="lab">Hubungkan ke saldo akun</div><div class="chips"><button class="chip'+(f.link?" on":"")+'" data-a="lk" data-v="'+o+'">Catat di saldo akun</button></div>'+(note?'<div class="note" style="margin-top:6px">'+note+'</div>':'')+(f.link?'<div class="lab">Akun</div><div class="chips">'+akunList().map(function(a){return '<button class="chip'+(f.akun===a?" on":"")+'" data-a="la" data-v="'+o+'|'+esc(a)+'">'+esc(a)+'</button>'}).join("")+'</div>':'')}
 function mkTx(kind,e,jenis,akun,kat,nom,tgl,nama,ket){var tx={id:uid(),tgl:tgl,jenis:jenis,akun:akun,kat:kat,nom:nom,ket:nama+(ket?" · "+ket:""),ts:Date.now(),src:kind,ref:e.id};e.akun=akun;e.tx=tx.id;S.tx.push(tx);call("api_add",tx).catch(function(){S.dbErr=true;render()});return tx}
@@ -337,7 +356,7 @@ function formU(){var f=S.fu;
   return '<div class="card" style="margin-top:12px"><div class="chips">'+Object.keys(TIPU).map(function(k){return '<button class="chip'+(f.tipe===k?" on":"")+'" data-a="u_tipe" data-v="'+k+'">'+TIPU[k]+'</button>'}).join("")+'</div>'+
   '<div class="lab">Nama</div><input class="in" data-f="fu.nama" value="'+esc(f.nama)+'" placeholder="'+(f.tipe==="tagihan"?"Misalnya listrik":"Nama orang atau lembaga")+'">'+'<div class="lab">Ikon (opsional, satu emoji)</div><input class="in" data-f="fu.ikon" maxlength="4" value="'+esc(f.ikon||"")+'" placeholder="'+DEFIC[f.tipe]+'">'+
   '<div class="lab">Nominal (Rp)</div><input class="in" data-f="fu.nom" data-num="1" inputmode="numeric" value="'+esc(f.nom)+'">'+
-  '<div class="lab">Jatuh tempo (opsional)</div><input class="in" type="date" data-f="fu.tempo" value="'+esc(f.tempo)+'">'+
+  '<div class="lab">Jatuh tempo (opsional)</div><input class="in" type="date" data-f="fu.tempo" value="'+esc(f.tempo)+'">'+ingRow("fu")+
   (f.tipe==="tagihan"?'<div class="lab">Berulang</div><div class="chips">'+Object.keys(ULG).map(function(k){return '<button class="chip'+(f.ulang===k?" on":"")+'" data-a="u_ulang" data-v="'+k+'">'+ULG[k]+'</button>'}).join("")+'</div>':'')+
   (!f.id&&(f.tipe==="utang"||f.tipe==="piutang")?linkRow("fu",f.tipe==="utang"?"Uang pinjaman dicatat masuk ke akun. Biarkan mati jika utang ini sudah lama dan uangnya sudah tercatat.":"Uang yang dipinjamkan dicatat keluar dari akun. Biarkan mati jika sudah tercatat."):'')+
   '<div class="lab">Keterangan</div><input class="in" data-f="fu.ket" value="'+esc(f.ket)+'" placeholder="Opsional">'+
@@ -345,6 +364,7 @@ function formU(){var f=S.fu;
 function cardU(u){
   var s=sisa(u),pc=u.nominal?Math.min(100,Math.round(u.dibayar/u.nominal*100)):0,rcv=u.tipe==="piutang",k=rcv?"terima":"bayar",tp="",n=logsOf(u.id).length;
   if(u.tempo&&!u.lunas){var d=dayDiff(u.tempo);tp='<small style="color:var(--'+(d<0?"out":"mut")+')">Jatuh tempo '+tglFmt(u.tempo)+(d<0?" · telat "+(-d)+" hari":d===0?" · hari ini":" · "+d+" hari lagi")+'</small>'}
+  if(u.ingat&&u.tempo&&!u.lunas)tp+='<small>🔔 Pengingat: '+ingTxt(u.ingat)+'</small>';
   var h='<div class="card" style="margin-top:10px;border-left:4px solid '+COLT[u.tipe]+'"><div style="display:flex;justify-content:space-between;gap:8px"><div class="rm"><div style="font-weight:500">'+itemIcon(u)+" "+esc(u.nama)+'</div><small><span class="tag" style="color:'+COLT[u.tipe]+';font-weight:500">'+TIPU[u.tipe]+'</span>'+(u.ulang?ULT[u.ulang]+" ":"")+(u.ket?esc(u.ket):"")+'</small></div><div class="amt">'+rp(u.lunas?u.nominal:s)+'</div></div>';
   var rb='<button class="mini" data-a="log_t" data-v="'+u.id+'">Riwayat ('+n+')</button>',db='<button class="mini" data-a="u_del" data-v="'+u.id+'">'+(S.del===u.id?"Hapus?":"Hapus")+'</button>';
   if(u.lunas)h+='<small style="color:var(--in);margin-top:6px">Lunas</small><div class="acts">'+rb+db+'</div>';
@@ -385,6 +405,7 @@ function formA(){var f=S.fa;
   (f.edit?'':'<div class="lab">'+(f.tipe==="tabungan"?"Saldo awal":"Modal awal")+' (Rp)</div><input class="in" data-f="fa.awal" data-num="1" inputmode="numeric" value="'+esc(f.awal)+'">')+
   (!f.edit&&f.tipe==="investasi"?'<div class="lab">Nilai sekarang (kosong = sama dengan modal)</div><input class="in" data-f="fa.nilai" data-num="1" inputmode="numeric" value="'+esc(f.nilai)+'">':'')+
   (!f.edit?linkRow("fa","Berlaku jika saldo atau modal awal diisi. Dicatat sebagai setoran keluar dari akun. Biarkan mati jika uangnya sudah lama dan sudah tercatat."):'')+
+  '<div class="lab">Tanggal pengingat (opsional, misalnya jadwal setor)</div><input class="in" type="date" data-f="fa.tempo" value="'+esc(f.tempo)+'">'+'<div class="lab">Berulang</div><div class="chips">'+Object.keys(ULG).map(function(k){return '<button class="chip'+(f.ulang===k?" on":"")+'" data-a="a_ulang" data-v="'+k+'">'+ULG[k]+'</button>'}).join("")+'</div>'+ingRow("fa")+
   '<div class="lab">Keterangan</div><input class="in" data-f="fa.ket" value="'+esc(f.ket)+'" placeholder="Opsional">'+
   '<div class="err2" style="text-align:left">'+esc(S.ferr)+'</div><div class="acts"><button class="mini on" data-a="a_save">Simpan</button><button class="mini" data-a="a_cancel">Batal</button></div></div>'}
 function cardA(a){
@@ -392,6 +413,7 @@ function cardA(a){
   var h='<div class="card" style="margin-top:10px;border-left:4px solid '+COLT[a.tipe]+'"><div style="display:flex;justify-content:space-between;gap:8px"><div class="rm"><div style="font-weight:500">'+itemIcon(a)+" "+esc(a.nama)+'</div><small><span class="tag" style="color:'+COLT[a.tipe]+';font-weight:500">'+TIPA[a.tipe]+'</span>'+(a.ket?esc(a.ket):"")+'</small></div><div class="amt">'+rp(a.nilai)+'</div></div>';
   if(inv)h+='<small style="margin-top:6px">Modal '+rp(a.modal)+' · <span style="color:var(--'+(g>=0?"in":"out")+')">'+(g>=0?"Untung ":"Rugi ")+rp(Math.abs(g))+(a.modal?' ('+Math.abs(Math.round(g/a.modal*1000)/10).toLocaleString("id-ID")+'%)':'')+'</span></small>';
   else if(a.target)h+='<div class="bar"><i style="width:'+Math.min(100,Math.round(a.nilai/a.target*100))+'%"></i></div><small>'+Math.round(a.nilai/a.target*100)+'% dari target '+rp(a.target)+'</small>';
+  if(a.tempo&&a.ingat)h+='<small style="margin-top:6px">🔔 '+tglFmt(nextOcc(a.tempo,a.ulang))+(a.ulang?" · "+ULT[a.ulang]:"")+' · '+ingTxt(a.ingat)+'</small>';
   if(S.ac&&S.ac.kind==="aset"&&S.ac.id===a.id)h+=formAc();
   else h+='<div class="acts"><button class="mini" data-a="ac_open" data-v="a|'+a.id+'|setor|0">Setor</button><button class="mini" data-a="ac_open" data-v="a|'+a.id+'|tarik|0">Tarik</button>'+(inv?'<button class="mini" data-a="ac_open" data-v="a|'+a.id+'|nilai|0">Update nilai</button>':'')+'<button class="mini" data-a="a_edit" data-v="'+a.id+'">Ubah</button><button class="mini" data-a="log_t" data-v="'+a.id+'">Riwayat ('+n+')</button><button class="mini" data-a="a_del" data-v="'+a.id+'">'+(S.del===a.id?"Hapus?":"Hapus")+'</button></div>';
   if(S.open[a.id])h+=logHtml(a);
@@ -483,6 +505,15 @@ function extra(a,v,t){
   var u,x,f,n;
   switch(a){
   case "dl":download();return true;
+  case "a_ulang":S.fa.ulang=v;render();return true;
+  case "ing":{var ix2=v.indexOf("|"),o2=v.slice(0,ix2),k2=v.slice(ix2+1),cur=(S[o2].ingat||"").split(",").filter(Boolean),pos=cur.indexOf(k2);if(pos>=0)cur.splice(pos,1);else cur.push(k2);cur.sort(function(a,b){return a-b});S[o2].ingat=cur.join(",");render();return true}
+  case "tg_on":{var on2=v==="1";S.tmsg="Memproses…";render();call("api_tgSetup",on2,S.tg.jam).then(function(r){S.tg=r;S.tmsg=on2?"Pengingat Telegram aktif. Buka tautan bot lalu tekan Start.":"Pengingat Telegram dimatikan."}).catch(function(e){S.tmsg=msg(e)}).then(function(){render()});return true}
+  case "tg_jam":{var jv=parseInt((document.getElementById("tgj")||{}).value,10);if(!(jv>=0&&jv<=23)){S.tmsg="Jam harus 0 sampai 23.";render();return true}tgOpt("jam",jv,"Jam kirim diubah ke "+pad(jv)+".00 WIB.");return true}
+  case "tg_nom":tgOpt("nom",!S.tg.nom,"Pengaturan nominal diperbarui.");return true;
+  case "tg_kode":if(S.del!=="tgkode"){S.del="tgkode";render();return true}S.del=null;tgOpt("kode",1,"Kode undangan diganti. Pengikut lama tetap menerima pengingat.");return true;
+  case "tg_clear":if(S.del!=="tgclear"){S.del="tgclear";render();return true}S.del=null;tgOpt("clear",1,"Semua pengikut dihapus. Mereka bisa daftar lagi lewat tautan.");return true;
+  case "tg_test":S.tmsg="Mengirim…";render();call("api_tgTest").then(function(r){S.tg=r.tg;S.tmsg=r.sent?"Pesan tes terkirim ke "+r.sent+" pengikut.":"Belum ada pengikut. Buka tautan bot lalu tekan Start."}).catch(function(e){S.tmsg=msg(e)}).then(function(){render()});return true;
+  case "tg_copy":(navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).then(function(){S.tmsg="Tautan disalin."},function(){S.tmsg="Tidak bisa menyalin. Salin manual dari kotak di atas."}).then(function(){render()});return true;
   case "akun2":S.akunTo=v;render();return true;
   case "fkat":S.fKat=v;render();return true;
   case "grp_t":S.hide[v]=!S.hide[v];render();return true;
@@ -511,8 +542,8 @@ function extra(a,v,t){
   case "ac_cancel":S.ac=null;S.ferr="";render();return true;
   case "ac_save":acSave();return true;
   case "ac_undo":if(S.del==="undo|"+v)undoLog(v);else{S.del="undo|"+v;render()}return true;
-  case "u_add":S.fu={id:"",tipe:"tagihan",nama:"",ikon:"",nom:"",tempo:"",ulang:"",ket:"",link:false,akun:S.akun};S.ac=null;S.ferr="";render();return true;
-  case "u_edit":u=findU(v);if(u){S.fu={id:u.id,tipe:u.tipe,nama:u.nama,ikon:u.ikon||"",nom:u.nominal.toLocaleString("id-ID"),tempo:u.tempo,ulang:u.ulang,ket:u.ket,link:false,akun:S.akun};S.ac=null;S.ferr="";render()}return true;
+  case "u_add":S.fu={id:"",tipe:"tagihan",nama:"",ikon:"",nom:"",tempo:"",ulang:"",ingat:"",ket:"",link:false,akun:S.akun};S.ac=null;S.ferr="";render();return true;
+  case "u_edit":u=findU(v);if(u){S.fu={id:u.id,tipe:u.tipe,nama:u.nama,ikon:u.ikon||"",nom:u.nominal.toLocaleString("id-ID"),tempo:u.tempo,ulang:u.ulang,ingat:u.ingat||"",ket:u.ket,link:false,akun:S.akun};S.ac=null;S.ferr="";render()}return true;
   case "u_cancel":S.fu=null;render();return true;
   case "u_tipe":S.fu.tipe=v;render();return true;
   case "u_ulang":S.fu.ulang=v;render();return true;
@@ -522,25 +553,27 @@ function extra(a,v,t){
     if(!n){S.ferr="Isi nominal dulu.";render();return true}
     var ul=f.tipe==="tagihan"?(f.ulang||""):"";
     if(ul&&!f.tempo){S.ferr="Tagihan berulang butuh tanggal jatuh tempo.";render();return true}
+    if(f.ingat&&!f.tempo){S.ferr="Pengingat butuh tanggal jatuh tempo.";render();return true}
     u=f.id?findU(f.id):null;
     var isNew=!u;if(isNew)u={id:uid(),dibayar:0,lunas:false};
-    u.tipe=f.tipe;u.nama=f.nama.trim();u.nominal=n;u.tempo=f.tempo||"";u.ulang=ul;u.ket=f.ket.trim();u.ikon=(f.ikon||"").trim();u.lunas=!ul&&u.dibayar>=u.nominal;
+    u.tipe=f.tipe;u.nama=f.nama.trim();u.nominal=n;u.tempo=f.tempo||"";u.ulang=ul;u.ket=f.ket.trim();u.ikon=(f.ikon||"").trim();u.ingat=f.tempo?(f.ingat||""):"";u.lunas=!ul&&u.dibayar>=u.nominal;
     if(isNew){S.utang.push(u);
       var le={id:uid(),jenis:"utang",item:u.id,nama:u.nama,aksi:"dibuat",nom:u.nominal,tgl:today(),akun:"",ket:"",tx:"",pd:0,pt:u.tempo,pl:false,ts:Date.now()};
       if(f.link&&(u.tipe==="utang"||u.tipe==="piutang"))mkTx("utang",le,u.tipe==="utang"?"in":"out",f.akun,u.tipe==="utang"?"Utang diterima":"Piutang diberikan",u.nominal,today(),u.nama,"");
       S.log.push(le);saveItem("log",le)}
     S.fu=null;saveItem("utang",u);render();return true;
   case "u_del":if(S.del===v){var gone=S.log.filter(function(l){return l.item===v&&l.tx}).map(function(l){return l.tx});S.tx=S.tx.filter(function(t){return gone.indexOf(t.id)<0});S.utang=S.utang.filter(function(z){return z.id!==v});S.log=S.log.filter(function(l){return l.item!==v});S.del=null;delItem("utang",v)}else S.del=v;render();return true;
-  case "a_add":S.fa={id:"",tipe:"tabungan",nama:"",ikon:"",target:"",awal:"",nilai:"",ket:"",edit:false,link:false,akun:S.akun};S.ac=null;S.ferr="";render();return true;
-  case "a_edit":x=findA(v);if(x){S.fa={id:x.id,tipe:x.tipe,nama:x.nama,ikon:x.ikon||"",target:x.target?x.target.toLocaleString("id-ID"):"",awal:"",nilai:"",ket:x.ket,edit:true,link:false,akun:S.akun};S.ac=null;S.ferr="";render()}return true;
+  case "a_add":S.fa={id:"",tipe:"tabungan",nama:"",ikon:"",target:"",awal:"",nilai:"",tempo:"",ulang:"",ingat:"",ket:"",edit:false,link:false,akun:S.akun};S.ac=null;S.ferr="";render();return true;
+  case "a_edit":x=findA(v);if(x){S.fa={id:x.id,tipe:x.tipe,nama:x.nama,ikon:x.ikon||"",target:x.target?x.target.toLocaleString("id-ID"):"",awal:"",nilai:"",tempo:x.tempo||"",ulang:x.ulang||"",ingat:x.ingat||"",ket:x.ket,edit:true,link:false,akun:S.akun};S.ac=null;S.ferr="";render()}return true;
   case "a_cancel":S.fa=null;render();return true;
   case "a_tipe":S.fa.tipe=v;render();return true;
   case "a_save":
     f=S.fa;
     if(!f.nama.trim()){S.ferr="Isi nama dulu.";render();return true}
+    if(f.ingat&&!f.tempo){S.ferr="Pengingat butuh tanggal pengingat.";render();return true}
     x=f.edit?findA(f.id):null;
-    if(x){x.ikon=(f.ikon||"").trim();x.nama=f.nama.trim();x.target=f.tipe==="tabungan"?num(f.target):0;x.ket=f.ket.trim()}
-    else{var md=num(f.awal);x={id:uid(),tipe:f.tipe,nama:f.nama.trim(),ikon:(f.ikon||"").trim(),target:f.tipe==="tabungan"?num(f.target):0,modal:md,nilai:f.tipe==="investasi"&&f.nilai?num(f.nilai):md,ket:f.ket.trim()};S.aset.push(x);
+    if(x){x.ikon=(f.ikon||"").trim();x.nama=f.nama.trim();x.target=f.tipe==="tabungan"?num(f.target):0;x.ket=f.ket.trim();x.tempo=f.tempo||"";x.ulang=f.tempo?(f.ulang||""):"";x.ingat=f.tempo?(f.ingat||""):""}
+    else{var md=num(f.awal);x={id:uid(),tipe:f.tipe,nama:f.nama.trim(),ikon:(f.ikon||"").trim(),target:f.tipe==="tabungan"?num(f.target):0,modal:md,nilai:f.tipe==="investasi"&&f.nilai?num(f.nilai):md,ket:f.ket.trim(),tempo:f.tempo||"",ulang:f.tempo?(f.ulang||""):"",ingat:f.tempo?(f.ingat||""):""};S.aset.push(x);
       if(md>0){var ae={id:uid(),jenis:"aset",item:x.id,nama:x.nama,aksi:"awal",nom:md,tgl:today(),akun:"",ket:"",tx:"",pm:0,pn:0,ts:Date.now()};
         if(f.link)mkTx("aset",ae,"out",f.akun,"Setor "+(x.tipe==="tabungan"?"tabungan":"investasi"),md,today(),x.nama,"");
         S.log.push(ae);saveItem("log",ae)}}
