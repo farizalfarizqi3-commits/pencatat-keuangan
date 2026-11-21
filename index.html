@@ -374,7 +374,7 @@ function vKal(){
   return b;
 }
 function rowT(t){var tf=t.src==="transfer",fee=t.src==="transferfee",o=t.jenis==="out",lk=fee||((t.src==="utang"||t.src==="aset")&&hasLog(t.ref));
-  return '<div class="row"><div class="ic">'+txIcon(t)+'</div><div class="rm"><div style="white-space:normal;overflow-wrap:anywhere">'+esc(t.kat)+(t.ket?" · "+esc(t.ket):"")+'</div><small>'+tglFmt(t.tgl)+" · "+esc(t.akun)+(t.src&&!tf?' · <b>'+SRCL[t.src]+'</b>':'')+'</small></div><div class="amt" style="color:var(--'+(tf?"mut":o?"out":"in")+')">'+(tf?"":o?"−":"+")+rp(t.nom).slice(3)+'</div>'+(lk?'':'<button class="x" data-a="del" data-v="'+t.id+'">'+(S.del===t.id?"Hapus?":"Hapus")+'</button>')+'</div>'}
+  return '<div class="row"><div class="ic">'+txIcon(t)+'</div><div class="rm"><div>'+esc(t.kat)+'</div><small style="overflow-wrap:anywhere">'+tglFmt(t.tgl)+" · "+esc(t.akun)+(t.ket?" · "+esc(t.ket):"")+(t.src&&!tf?' · <b>'+SRCL[t.src]+'</b>':'')+'</small></div><div class="amt" style="color:var(--'+(tf?"mut":o?"out":"in")+')">'+(tf?"":o?"−":"+")+rp(t.nom).slice(3)+'</div>'+(lk?'':'<button class="x" data-a="del" data-v="'+t.id+'">'+(S.del===t.id?"Hapus?":"Hapus")+'</button>')+'</div>'}
 function visT(t){if(t.src==="transfer"&&t.jenis==="in")return false;return S.fKat==="semua"||t.kat===S.fKat||(S.fKat==="Transfer"&&t.src==="transferfee")}
 function dayHead(tgl,g){var o=g.filter(function(t){return t.jenis==="out"&&t.src!=="transfer"}).reduce(function(s,t){return s+t.nom},0),dt=new Date(tgl+"T00:00").toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
   return '<div class="dh"><span>'+(tgl===today()?"Hari ini · ":"")+dt+'</span>'+(o?'<span>Keluar '+rp(o)+'</span>':'')+'</div>'}
