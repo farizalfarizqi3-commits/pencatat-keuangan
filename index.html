@@ -92,6 +92,59 @@ nav button{font-size:11px;padding:6px 2px}
 .fscroll{display:flex;gap:6px;overflow-x:auto;padding:10px 0 4px;-webkit-overflow-scrolling:touch}.fscroll .mini{flex:none;white-space:nowrap}
 .dh{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;font-weight:500;color:#fff;background:var(--b);padding:9px 12px;border-radius:10px;margin:18px 0 2px}
 .dh span+span{background:rgba(255,255,255,.2);padding:2px 10px;border-radius:999px;white-space:nowrap;font-size:12px}
+
+.rw-sub{font-size:13px;color:#B5D4F4;margin-top:2px}
+.rw-bar{display:flex;gap:8px;margin-top:16px;align-items:center}
+.rw-search{position:relative;flex:1;min-width:0}
+.rw-search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--mut);pointer-events:none}
+.rw-search .in{padding-left:42px;border-radius:999px;background:var(--card);border-color:transparent}
+.rw-search .in:focus{outline:2px solid #378ADD;outline-offset:0}
+.rw-dl{display:flex;align-items:center;gap:6px;height:44px;flex:none;border:0;border-radius:999px;background:#185FA5;color:#fff;font:inherit;font-size:14px;font-weight:500;padding:0 16px;cursor:pointer}
+.rw-dl svg{width:18px;height:18px}
+.rw-dl.off{background:var(--bt);color:var(--fg)}
+.rw-kat{display:flex;align-items:center;gap:8px;width:100%;border:0;border-radius:14px;background:var(--card);color:var(--fg);font:inherit;padding:12px 14px;margin-top:12px;cursor:pointer;text-align:left}
+.rw-kat small{color:var(--mut);font-size:13px}
+.rw-kat b{font-weight:500;margin-left:auto}
+.rw-kat i{font-style:normal;color:var(--mut);font-size:12px}
+.rw-chips{display:flex;flex-wrap:wrap;gap:6px;padding:10px 2px 2px}
+.rw-chip{border:1px solid var(--bl);background:var(--bg);color:var(--fg);border-radius:999px;padding:6px 13px;font:inherit;font-size:13px;cursor:pointer}
+.rw-chip.on{background:#185FA5;border-color:#185FA5;color:#fff}
+.rw-cap{font-size:12px;color:var(--mut);margin:20px 4px 8px;min-height:1px}
+.rw-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:var(--card);border-radius:18px;padding:14px 4px}
+.rw-sum>div{padding:0 12px;min-width:0}
+.rw-sum>div+div{border-left:1px solid rgba(127,127,127,.22)}
+.rw-sum small{display:flex;align-items:center;gap:6px;color:var(--mut);font-size:12px}
+.rw-sum small i{width:7px;height:7px;border-radius:50%;display:inline-block}
+.rw-sum b{display:block;font-size:13.5px;white-space:nowrap;font-weight:600;margin-top:5px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.rw-day{margin-top:20px}
+.rw-dh{display:flex;justify-content:space-between;align-items:flex-end;gap:8px;padding:0 4px 8px}
+.rw-dh b{display:block;font-size:15px;font-weight:600}
+.rw-dh small{color:var(--mut);font-size:12px;white-space:nowrap}.rw-dh>div:first-child{flex:none}
+.rw-pills{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.rw-p{font-size:11.5px;font-weight:500;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.rw-p.o{background:rgba(163,45,45,.12);color:var(--out)}
+.rw-p.i{background:rgba(59,109,17,.16);color:var(--in)}
+.rw-list{background:var(--card);border-radius:18px;padding:2px 14px}
+.rw-row{display:flex;align-items:center;gap:12px;padding:13px 0}
+.rw-row+.rw-row{border-top:1px solid rgba(127,127,127,.2)}
+.rw-ic{width:40px;height:40px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:19px;flex:none;background:var(--bt)}
+.rw-ic.o{background:rgba(163,45,45,.12)}
+.rw-ic.i{background:rgba(59,109,17,.16)}
+.rw-m{flex:1;min-width:0}
+.rw-k{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rw-tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;background:var(--bt);color:var(--mut);margin-top:3px}
+.rw-n{font-size:12px;color:var(--mut);margin-top:4px;overflow-wrap:anywhere;line-height:1.35}
+.rw-r{text-align:right;flex:none}
+.rw-a{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.rw-a em{font-style:normal;font-weight:400;font-size:11px;opacity:.7;margin-right:2px}
+.rw-a.o{color:var(--out)}.rw-a.i{color:var(--in)}.rw-a.t{color:var(--mut)}
+.rw-x{border:0;background:transparent;color:var(--mut);font:inherit;font-size:11.5px;cursor:pointer;padding:7px 0 0;display:inline-flex;align-items:center;gap:3px}
+.rw-x svg{width:13px;height:13px}
+.rw-x.ask{color:var(--out);font-weight:600}
+.rw-empty{text-align:center;color:var(--mut);padding:44px 12px 30px;line-height:1.5}
+.rw-empty span{display:block;font-size:38px;margin-bottom:6px}
+.rw-empty b{display:block;color:var(--fg);font-weight:600;margin-bottom:2px}
+.rw-panel{margin-top:12px;border:1px solid var(--bl);border-radius:18px;padding:14px 16px 16px}
 </style></head>
 <body>
 <div id="app"></div>
@@ -194,17 +247,17 @@ function sum(arr,j,all){return arr.filter(function(t){return t.jenis===j&&(all||
 function lastDay(b){var y=Number(b.slice(0,4)),m=Number(b.slice(5,7));return b+"-"+pad(new Date(y,m,0).getDate())}
 function katLabel(){return S.fKat==="semua"?"Semua kategori":S.fKat}
 function formRd(){var f=S.rd;
-  return '<div class="card" style="margin-top:12px"><div style="font-weight:500">Unduh riwayat</div>'+
-  '<div class="note" style="margin-top:4px">Kategori: <b>'+esc(katLabel())+'</b>. Untuk kategori lain, pilih dulu di bawah.</div>'+
+  return '<div class="rw-panel"><div style="font-weight:600">Simpan riwayat</div>'+
+  '<div class="note" style="margin-top:4px">Kategori yang ikut: <b>'+esc(katLabel())+'</b>. Mau kategori lain? Pilih dulu di bawah ya.</div>'+
   '<div class="lab">Dari tanggal</div><input class="in" type="date" data-f="rd.from" value="'+esc(f.from)+'">'+
   '<div class="lab">Sampai tanggal</div><input class="in" type="date" data-f="rd.to" value="'+esc(f.to)+'">'+
   '<div class="lab">Format file</div><div class="chips"><button class="chip'+(f.fmt==="xlsx"?" on":"")+'" data-a="rd_fmt" data-v="xlsx">Excel</button><button class="chip'+(f.fmt==="pdf"?" on":"")+'" data-a="rd_fmt" data-v="pdf">PDF</button></div>'+
   (f.msg?(f.ok?'<div class="ok">':'<div class="err2" style="text-align:left">')+esc(f.msg)+'</div>':'')+
-  '<button class="btn" style="margin-top:12px" data-a="rd_go">'+(f.busy?"Menyiapkan file…":"Unduh ke perangkat ini")+'</button></div>';
+  '<button class="btn" style="margin-top:12px" data-a="rd_go">'+(f.busy?"Menyiapkan file…":"Simpan ke perangkat ini")+'</button></div>';
 }
 function vRiwayat(){
-  var h=hd("Riwayat",monthInput());
-  return h+'<div class="bd"><div class="krow" style="margin-top:14px"><input class="in" id="q_r" type="search" placeholder="Cari catatan, kategori, nominal" value="'+esc(S.qR)+'"><button class="mini on" data-a="rd_t" style="display:flex;align-items:center;gap:6px;height:44px;flex:none;border-radius:12px">'+(S.rd?"Tutup":IC('<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>')+"Unduh")+'</button></div>'+(S.rd?formRd():'')+katChips()+'<div id="lst">'+rowsR()+'</div></div>';
+  var h=hd("Riwayat",'<div class="rw-sub">Jejak uangmu, tercatat rapi per hari</div>'+monthInput());
+  return h+'<div class="bd"><div class="rw-bar"><div class="rw-search">'+IC('<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>')+'<input class="in" id="q_r" type="search" placeholder="Cari transaksi…" value="'+esc(S.qR)+'"></div><button class="rw-dl'+(S.rd?" off":"")+'" data-a="rd_t">'+(S.rd?"Tutup":IC('<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>')+"Unduh")+'</button></div>'+(S.rd?formRd():'')+katChips()+'<div id="lst">'+rowsR()+'</div></div>';
 }
 function rdRows(f){return S.tx.filter(function(t){return visT(t)&&t.tgl>=f.from&&t.tgl<=f.to}).sort(function(a,b){return a.tgl<b.tgl?-1:a.tgl>b.tgl?1:(a.ts||0)-(b.ts||0)})}
 function jenisTxt(t){return t.src==="transfer"?"Transfer":t.jenis==="out"?"Pengeluaran":"Pemasukan"}
@@ -373,29 +426,34 @@ function vKal(){
   else b+='<div class="note">Ketuk tanggal untuk melihat total pengeluaran hari itu. Warna makin pekat berarti pengeluaran makin besar.</div>';
   return b;
 }
-function rowT(t){var tf=t.src==="transfer",fee=t.src==="transferfee",o=t.jenis==="out",lk=fee||((t.src==="utang"||t.src==="aset")&&hasLog(t.ref));
-  return '<div class="row"><div class="ic">'+txIcon(t)+'</div><div class="rm"><div>'+esc(t.kat)+'</div><small>'+tglFmt(t.tgl)+" · "+esc(t.akun)+(t.src&&!tf?' · <b>'+SRCL[t.src]+'</b>':'')+'</small>'+(t.ket?'<div style="font-size:12px;color:var(--mut);white-space:normal;overflow-wrap:anywhere">'+esc(t.ket)+'</div>':'')+'</div><div class="amt" style="color:var(--'+(tf?"mut":o?"out":"in")+')">'+(tf?"":o?"−":"+")+rp(t.nom).slice(3)+'</div>'+(lk?'':'<button class="x" data-a="del" data-v="'+t.id+'">'+(S.del===t.id?"Hapus?":"Hapus")+'</button>')+'</div>'}
+var TRASH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
+function rowT(t){var tf=t.src==="transfer",fee=t.src==="transferfee",o=t.jenis==="out",lk=fee||((t.src==="utang"||t.src==="aset")&&hasLog(t.ref)),c=tf?"t":o?"o":"i";
+  return '<div class="rw-row"><div class="rw-ic '+(tf?"":c)+'">'+txIcon(t)+'</div><div class="rw-m"><div class="rw-k">'+esc(t.kat)+'</div><span class="rw-tag">'+esc(t.akun)+(t.src&&!tf?' · '+SRCL[t.src]:'')+'</span>'+(t.ket?'<div class="rw-n">'+esc(t.ket)+'</div>':'')+'</div><div class="rw-r"><div class="rw-a '+c+'">'+(tf?"":o?"−":"+")+'<em>Rp</em>'+rp(t.nom).slice(3)+'</div>'+(lk?'':'<button class="rw-x'+(S.del===t.id?" ask":"")+'" data-a="del" data-v="'+t.id+'">'+TRASH+(S.del===t.id?"Yakin hapus?":"Hapus")+'</button>')+'</div></div>'}
 function visT(t){if(t.src==="transfer"&&t.jenis==="in")return false;return S.fKat==="semua"||t.kat===S.fKat||(S.fKat==="Transfer"&&t.src==="transferfee")}
-function dayHead(tgl,g){var o=g.filter(function(t){return t.jenis==="out"&&t.src!=="transfer"}).reduce(function(s,t){return s+t.nom},0),dt=new Date(tgl+"T00:00").toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
-  return '<div class="dh"><span>'+(tgl===today()?"Hari ini · ":"")+dt+'</span>'+(o?'<span>Keluar '+rp(o)+'</span>':'')+'</div>'}
-function rowsGrp(l){var o="",i=0;while(i<l.length){var d=l[i].tgl,g=[];while(i<l.length&&l[i].tgl===d){g.push(l[i]);i++}o+=dayHead(d,g)+g.map(rowT).join("")}return o}
+function rwYmd(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function dayName(tgl){var y=new Date();y.setDate(y.getDate()-1);if(tgl===today())return "Hari ini";if(tgl===rwYmd(y))return "Kemarin";return new Date(tgl+"T00:00").toLocaleDateString("id-ID",{weekday:"long"})}
+function dayHead(tgl,g){var real=g.filter(function(t){return t.src!=="transfer"}),o=sum(real,"out"),i=sum(real,"in");
+  return '<div class="rw-dh"><div><b>'+dayName(tgl)+'</b><small>'+new Date(tgl+"T00:00").toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"})+'</small></div><div class="rw-pills">'+(i?'<span class="rw-p i">Masuk '+rp(i)+'</span>':'')+(o?'<span class="rw-p o">Keluar '+rp(o)+'</span>':'')+'</div></div>'}
+function rowsGrp(l){var o="",i=0;while(i<l.length){var d=l[i].tgl,g=[];while(i<l.length&&l[i].tgl===d){g.push(l[i]);i++}o+='<div class="rw-day">'+dayHead(d,g)+'<div class="rw-list">'+g.map(rowT).join("")+'</div></div>'}return o}
 function katChips(){
-  var seen={Transfer:1},l=[["semua","Semua",""]];
+  var seen={Transfer:1},l=[["semua","Semua kategori",""]];
   KAT.out.concat(KAT.in).forEach(function(k){if(!seen[k.n]){seen[k.n]=1;l.push([k.n,k.n,k.i])}});
   l.push(["Transfer","Transfer","🔁"]);
   if(S.fKat!=="semua"&&!l.some(function(c){return c[0]===S.fKat}))S.fKat="semua";
   var cur=l.filter(function(c){return c[0]===S.fKat})[0]||l[0];
-  var b='<button class="grp" data-a="kat_t"><span>'+(S.katOpen?"▾":"▸")+'</span> Kategori <span class="gc">'+(cur[2]?esc(cur[2])+" ":"")+esc(cur[1])+'</span></button>';
-  if(S.katOpen)b+='<div class="chips" style="padding:4px 0 10px">'+l.map(function(c){return '<button class="mini'+(S.fKat===c[0]?" on":"")+'" data-a="fkat" data-v="'+esc(c[0])+'">'+(c[2]?esc(c[2])+" ":"")+esc(c[1])+'</button>'}).join("")+'</div>';
+  var b='<button class="rw-kat" data-a="kat_t" aria-expanded="'+(!!S.katOpen)+'"><small>Kategori</small><b>'+(cur[2]?esc(cur[2])+" ":"")+esc(cur[1])+'</b><i>'+(S.katOpen?"▲":"▼")+'</i></button>';
+  if(S.katOpen)b+='<div class="rw-chips">'+l.map(function(c){return '<button class="rw-chip'+(S.fKat===c[0]?" on":"")+'" data-a="fkat" data-v="'+esc(c[0])+'">'+(c[2]?esc(c[2])+" ":"")+esc(c[1])+'</button>'}).join("")+'</div>';
   return b;
 }
+function rwEmpty(e,t,d){return '<div class="rw-empty"><span>'+e+'</span><b>'+t+'</b>'+d+'</div>'}
 function rowsR(){
   var q=S.qR.trim(),l;
   if(q){l=S.tx.slice().sort(bydate).filter(function(t){return visT(t)&&matchQ(q,[t.kat,t.ket,t.akun,t.tgl,tglFmt(t.tgl),nomTxt(t.nom),t.jenis==="out"?"pengeluaran":"pemasukan",t.src?SRCL[t.src]:""])});
-    return '<div class="note" style="margin-top:12px">'+l.length+' hasil di semua bulan</div>'+(l.length?rowsGrp(l):'<div class="empty">Tidak ada catatan yang cocok.</div>')}
-  l=listBulan().filter(visT);var d=l;
-  var b='<div class="cards"><div class="card"><small>Pemasukan</small><strong style="color:var(--in)">'+rp(sum(d,"in"))+'</strong></div><div class="card"><small>Pengeluaran</small><strong style="color:var(--out)">'+rp(sum(d,"out"))+'</strong></div></div>';
-  if(!l.length)b+='<div class="empty">'+(S.fKat==="semua"?'Belum ada transaksi di '+blnFmt(S.bulan)+'.':'Tidak ada transaksi kategori "'+esc(S.fKat)+'" di '+blnFmt(S.bulan)+'.')+'</div>';
+    return l.length?'<div class="rw-cap">Ketemu '+l.length+' transaksi di semua bulan</div>'+rowsGrp(l):rwEmpty("🔎","Tidak ketemu","Coba kata kunci lain, misalnya nama kategori atau nominalnya.")}
+  l=listBulan().filter(visT);
+  var pi=sum(l,"in"),po=sum(l,"out"),ne=pi-po;
+  var b='<div class="rw-cap">Ringkasan '+(S.fKat!=="semua"?esc(katLabel())+" · ":"")+blnFmt(S.bulan)+'</div><div class="rw-sum"><div><small><i style="background:var(--in)"></i>Masuk</small><b style="color:var(--in)">'+rp(pi)+'</b></div><div><small><i style="background:var(--out)"></i>Keluar</small><b style="color:var(--out)">'+rp(po)+'</b></div><div><small><i style="background:var(--mut)"></i>Selisih</small><b style="color:var(--'+(ne<0?"out":"in")+')">'+(ne<0?"−":"")+rp(Math.abs(ne))+'</b></div></div>';
+  if(!l.length)return b+(S.fKat==="semua"?rwEmpty("🌱","Belum ada transaksi","Di "+blnFmt(S.bulan)+" belum ada catatan. Yuk mulai dari menu Catat."):rwEmpty("🗂","Belum ada yang masuk","Tidak ada transaksi "+esc(katLabel())+" di "+blnFmt(S.bulan)+". Coba kategori lain atau ganti bulan."));
   return b+rowsGrp(l);
 }
 function formAc(){var f=S.ac,lbl={bayar:"Catat pembayaran",terima:"Catat diterima",setor:"Setor",tarik:"Tarik",nilai:"Update nilai"}[f.k];
