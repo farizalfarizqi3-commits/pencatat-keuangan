@@ -145,6 +145,10 @@ nav button{font-size:11px;padding:6px 2px}
 .rw-empty span{display:block;font-size:38px;margin-bottom:6px}
 .rw-empty b{display:block;color:var(--fg);font-weight:600;margin-bottom:2px}
 .rw-panel{margin-top:12px;border:1px solid var(--bl);border-radius:18px;padding:14px 16px 16px}
+.rw-seg{display:flex;gap:4px;background:var(--card);border-radius:999px;padding:4px;margin-top:12px}
+.rw-seg button{flex:1;border:0;background:transparent;color:var(--mut);font:inherit;font-size:13.5px;border-radius:999px;padding:9px 4px;cursor:pointer;transition:background .15s,color .15s}
+.rw-seg button.on{color:#fff;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.rw-seg button.semua.on{background:#185FA5}.rw-seg button.in.on{background:#3B6D11}.rw-seg button.out.on{background:#A32D2D}
 </style></head>
 <body>
 <div id="app"></div>
@@ -164,7 +168,7 @@ if(!KAT.akun.some(function(k){return k.n===S.akun}))S.akun=KAT.akun.length?KAT.a
 if(S.akunTo===S.akun||!KAT.akun.some(function(k){return k.n===S.akunTo})){var o=KAT.akun.filter(function(k){return k.n!==S.akun})[0];S.akunTo=o?o.n:""}}
 function pad(n){return n<10?"0"+n:""+n}
 function today(){var d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
-var S={katOpen:false,rd:null,rdFmt:"xlsx",dlFmt:"xlsx",fKat:"semua",akunTo:"",fee:"",log:[],qR:"",qU:"",qA:"",open:{},ac:null,dl:"",dlBusy:false,fU:"semua",fA:"semua",utang:[],aset:[],fu:null,fa:null,pay:"",act:null,ferr:"",selDay:today(),email:"muhammadalfarizqi13@gmail.com",forgot:false,auth:false,loading:false,pinErr:"",rem:false,autoDay:1,rsBk:true,rsAsk:false,rmsg:"",orAsk:false,omsg:"",hide:{u_lunas:true,a_tercapai:true},auto:false,last:"",busy:"",bmsg:"",pmsg:"",tx:[],jenis:"out",akun:"Cash",kat:"Makan",nom:"",ket:"",tgl:today(),tab:"catat",bulan:today().slice(0,7),del:null,dbErr:false,msg:"",err:""};
+var S={fJenis:"semua",katOpen:false,rd:null,rdFmt:"xlsx",dlFmt:"xlsx",fKat:"semua",akunTo:"",fee:"",log:[],qR:"",qU:"",qA:"",open:{},ac:null,dl:"",dlBusy:false,fU:"semua",fA:"semua",utang:[],aset:[],fu:null,fa:null,pay:"",act:null,ferr:"",selDay:today(),email:"muhammadalfarizqi13@gmail.com",forgot:false,auth:false,loading:false,pinErr:"",rem:false,autoDay:1,rsBk:true,rsAsk:false,rmsg:"",orAsk:false,omsg:"",hide:{u_lunas:true,a_tercapai:true},auto:false,last:"",busy:"",bmsg:"",pmsg:"",tx:[],jenis:"out",akun:"Cash",kat:"Makan",nom:"",ket:"",tgl:today(),tab:"catat",bulan:today().slice(0,7),del:null,dbErr:false,msg:"",err:""};
 var EYE='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 var EYEOFF='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.1 6.1C3.6 7.8 2 12 2 12s3.6 7 10 7c1.7 0 3.2-.4 4.5-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
 function pw(id,ph,extra){return '<div class="pw"><input class="in'+(extra||"")+'" id="'+id+'" type="password" inputmode="numeric" maxlength="12" placeholder="'+ph+'" autocomplete="off"><button class="eye" type="button" data-a="eye" data-v="'+id+'" aria-label="Tampilkan PIN">'+EYE+'</button></div>'}
@@ -245,10 +249,11 @@ function simpanTf(){
 function listBulan(){return S.tx.filter(function(t){return t.tgl.slice(0,7)===S.bulan}).sort(function(a,b){return a.tgl<b.tgl?1:a.tgl>b.tgl?-1:(b.ts||0)-(a.ts||0)})}
 function sum(arr,j,all){return arr.filter(function(t){return t.jenis===j&&(all||t.src!=="transfer")}).reduce(function(s,t){return s+t.nom},0)}
 function lastDay(b){var y=Number(b.slice(0,4)),m=Number(b.slice(5,7));return b+"-"+pad(new Date(y,m,0).getDate())}
-function katLabel(){return S.fKat==="semua"?"Semua kategori":S.fKat}
+function isFilt(){return S.fKat!=="semua"||S.fJenis!=="semua"}
+function katLabel(){var j=S.fJenis==="out"?"Pengeluaran":S.fJenis==="in"?"Pemasukan":"";return S.fKat==="semua"?(j||"Semua kategori"):(j?j+" · ":"")+S.fKat}
 function formRd(){var f=S.rd;
   return '<div class="rw-panel"><div style="font-weight:600">Simpan riwayat</div>'+
-  '<div class="note" style="margin-top:4px">Kategori yang ikut: <b>'+esc(katLabel())+'</b>. Mau kategori lain? Pilih dulu di bawah ya.</div>'+
+  '<div class="note" style="margin-top:4px">Yang ikut diunduh: <b>'+esc(katLabel())+'</b>. Mau yang lain? Atur dulu filternya di bawah ya.</div>'+
   '<div class="lab">Dari tanggal</div><input class="in" type="date" data-f="rd.from" value="'+esc(f.from)+'">'+
   '<div class="lab">Sampai tanggal</div><input class="in" type="date" data-f="rd.to" value="'+esc(f.to)+'">'+
   '<div class="lab">Format file</div><div class="chips"><button class="chip'+(f.fmt==="xlsx"?" on":"")+'" data-a="rd_fmt" data-v="xlsx">Excel</button><button class="chip'+(f.fmt==="pdf"?" on":"")+'" data-a="rd_fmt" data-v="pdf">PDF</button></div>'+
@@ -297,8 +302,8 @@ function dlRiwayat(){
   if(!/^\d{4}-\d{2}-\d{2}$/.test(f.from)||!/^\d{4}-\d{2}-\d{2}$/.test(f.to)){f.ok=false;f.msg="Isi tanggal awal dan akhir dulu.";render();return}
   if(f.from>f.to){f.ok=false;f.msg="Tanggal awal tidak boleh setelah tanggal akhir.";render();return}
   var l=rdRows(f);
-  if(!l.length){f.ok=false;f.msg="Tidak ada transaksi pada rentang ini untuk "+(S.fKat==="semua"?"semua kategori":"kategori "+S.fKat)+".";render();return}
-  var kat=katLabel(),inn=sum(l,"in"),ot=sum(l,"out"),name="Riwayat-"+(S.fKat==="semua"?"Semua":slug(S.fKat))+"-"+f.from+"_sd_"+f.to,ext=f.fmt==="pdf"?"pdf":"xlsx";
+  if(!l.length){f.ok=false;f.msg="Tidak ada transaksi pada rentang ini untuk pilihan "+katLabel()+".";render();return}
+  var kat=katLabel(),inn=sum(l,"in"),ot=sum(l,"out"),name="Riwayat-"+(isFilt()?slug(katLabel()):"Semua")+"-"+f.from+"_sd_"+f.to,ext=f.fmt==="pdf"?"pdf":"xlsx";
   f.busy=true;f.msg="";render();
   (ext==="pdf"?loadPdf().then(function(){return pdfRiwayat(l,kat,f,inn,ot)}):loadXlsx().then(function(){return xlsRiwayat(l,kat,f,inn,ot)}))
   .then(function(blob){saveBlob(blob,name+"."+ext);f.ok=true;f.msg="File "+name+"."+ext+" ("+l.length+" transaksi) dikirim ke folder Unduhan perangkat ini."})
@@ -429,7 +434,7 @@ function vKal(){
 var TRASH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
 function rowT(t){var tf=t.src==="transfer",fee=t.src==="transferfee",o=t.jenis==="out",lk=fee||((t.src==="utang"||t.src==="aset")&&hasLog(t.ref)),c=tf?"t":o?"o":"i";
   return '<div class="rw-row"><div class="rw-ic '+(tf?"":c)+'">'+txIcon(t)+'</div><div class="rw-m"><div class="rw-k">'+esc(t.kat)+'</div><span class="rw-tag">'+esc(t.akun)+(t.src&&!tf?' · '+SRCL[t.src]:'')+'</span>'+(t.ket?'<div class="rw-n">'+esc(t.ket)+'</div>':'')+'</div><div class="rw-r"><div class="rw-a '+c+'">'+(tf?"":o?"−":"+")+'<em>Rp</em>'+rp(t.nom).slice(3)+'</div>'+(lk?'':'<button class="rw-x'+(S.del===t.id?" ask":"")+'" data-a="del" data-v="'+t.id+'">'+TRASH+(S.del===t.id?"Yakin hapus?":"Hapus")+'</button>')+'</div></div>'}
-function visT(t){if(t.src==="transfer"&&t.jenis==="in")return false;return S.fKat==="semua"||t.kat===S.fKat||(S.fKat==="Transfer"&&t.src==="transferfee")}
+function visT(t){if(t.src==="transfer"&&t.jenis==="in")return false;if(S.fJenis!=="semua"&&(t.src==="transfer"||t.jenis!==S.fJenis))return false;return S.fKat==="semua"||t.kat===S.fKat||(S.fKat==="Transfer"&&t.src==="transferfee")}
 function rwYmd(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
 function dayName(tgl){var y=new Date();y.setDate(y.getDate()-1);if(tgl===today())return "Hari ini";if(tgl===rwYmd(y))return "Kemarin";return new Date(tgl+"T00:00").toLocaleDateString("id-ID",{weekday:"long"})}
 function dayHead(tgl,g){var real=g.filter(function(t){return t.src!=="transfer"}),o=sum(real,"out"),i=sum(real,"in");
@@ -437,12 +442,13 @@ function dayHead(tgl,g){var real=g.filter(function(t){return t.src!=="transfer"}
 function rowsGrp(l){var o="",i=0;while(i<l.length){var d=l[i].tgl,g=[];while(i<l.length&&l[i].tgl===d){g.push(l[i]);i++}o+='<div class="rw-day">'+dayHead(d,g)+'<div class="rw-list">'+g.map(rowT).join("")+'</div></div>'}return o}
 function katChips(){
   var seen={Transfer:1},l=[["semua","Semua kategori",""]];
-  KAT.out.concat(KAT.in).forEach(function(k){if(!seen[k.n]){seen[k.n]=1;l.push([k.n,k.n,k.i])}});
-  l.push(["Transfer","Transfer","🔁"]);
+  (S.fJenis==="out"?KAT.out:S.fJenis==="in"?KAT.in:KAT.out.concat(KAT.in)).forEach(function(k){if(!seen[k.n]){seen[k.n]=1;l.push([k.n,k.n,k.i])}});
+  if(S.fJenis==="semua")l.push(["Transfer","Transfer","🔁"]);
   if(S.fKat!=="semua"&&!l.some(function(c){return c[0]===S.fKat}))S.fKat="semua";
   var cur=l.filter(function(c){return c[0]===S.fKat})[0]||l[0];
-  var b='<button class="rw-kat" data-a="kat_t" aria-expanded="'+(!!S.katOpen)+'"><small>Kategori</small><b>'+(cur[2]?esc(cur[2])+" ":"")+esc(cur[1])+'</b><i>'+(S.katOpen?"▲":"▼")+'</i></button>';
-  if(S.katOpen)b+='<div class="rw-chips">'+l.map(function(c){return '<button class="rw-chip'+(S.fKat===c[0]?" on":"")+'" data-a="fkat" data-v="'+esc(c[0])+'">'+(c[2]?esc(c[2])+" ":"")+esc(c[1])+'</button>'}).join("")+'</div>';
+  var SG=[["semua","Semua"],["in","Pemasukan"],["out","Pengeluaran"]];
+  var b='<div class="rw-seg" role="group" aria-label="Jenis transaksi">'+SG.map(function(s){return '<button class="'+s[0]+(S.fJenis===s[0]?" on":"")+'" data-a="fj" data-v="'+s[0]+'">'+s[1]+'</button>'}).join("")+'</div><button class="rw-kat" data-a="kat_t" aria-expanded="'+(!!S.katOpen)+'"><small>Kategori</small><b>'+(cur[2]?esc(cur[2])+" ":"")+esc(cur[1]==="Semua kategori"?(S.fJenis==="out"?"Semua pengeluaran":S.fJenis==="in"?"Semua pemasukan":"Semua kategori"):cur[1])+'</b><i>'+(S.katOpen?"▲":"▼")+'</i></button>';
+  if(S.katOpen)b+='<div class="rw-chips">'+l.map(function(c){return '<button class="rw-chip'+(S.fKat===c[0]?" on":"")+'" data-a="fkat" data-v="'+esc(c[0])+'">'+(c[2]?esc(c[2])+" ":"")+esc(c[0]==="semua"?"Semua":c[1])+'</button>'}).join("")+'</div>';
   return b;
 }
 function rwEmpty(e,t,d){return '<div class="rw-empty"><span>'+e+'</span><b>'+t+'</b>'+d+'</div>'}
@@ -452,8 +458,8 @@ function rowsR(){
     return l.length?'<div class="rw-cap">Ketemu '+l.length+' transaksi di semua bulan</div>'+rowsGrp(l):rwEmpty("🔎","Tidak ketemu","Coba kata kunci lain, misalnya nama kategori atau nominalnya.")}
   l=listBulan().filter(visT);
   var pi=sum(l,"in"),po=sum(l,"out"),ne=pi-po;
-  var b='<div class="rw-cap">Ringkasan '+(S.fKat!=="semua"?esc(katLabel())+" · ":"")+blnFmt(S.bulan)+'</div><div class="rw-sum"><div><small><i style="background:var(--in)"></i>Masuk</small><b style="color:var(--in)">'+rp(pi)+'</b></div><div><small><i style="background:var(--out)"></i>Keluar</small><b style="color:var(--out)">'+rp(po)+'</b></div><div><small><i style="background:var(--mut)"></i>Selisih</small><b style="color:var(--'+(ne<0?"out":"in")+')">'+(ne<0?"−":"")+rp(Math.abs(ne))+'</b></div></div>';
-  if(!l.length)return b+(S.fKat==="semua"?rwEmpty("🌱","Belum ada transaksi","Di "+blnFmt(S.bulan)+" belum ada catatan. Yuk mulai dari menu Catat."):rwEmpty("🗂","Belum ada yang masuk","Tidak ada transaksi "+esc(katLabel())+" di "+blnFmt(S.bulan)+". Coba kategori lain atau ganti bulan."));
+  var b='<div class="rw-cap">Ringkasan '+(isFilt()?esc(katLabel())+" · ":"")+blnFmt(S.bulan)+'</div><div class="rw-sum"><div><small><i style="background:var(--in)"></i>Masuk</small><b style="color:var(--in)">'+rp(pi)+'</b></div><div><small><i style="background:var(--out)"></i>Keluar</small><b style="color:var(--out)">'+rp(po)+'</b></div><div><small><i style="background:var(--mut)"></i>Selisih</small><b style="color:var(--'+(ne<0?"out":"in")+')">'+(ne<0?"−":"")+rp(Math.abs(ne))+'</b></div></div>';
+  if(!l.length)return b+(!isFilt()?rwEmpty("🌱","Belum ada transaksi","Di "+blnFmt(S.bulan)+" belum ada catatan. Yuk mulai dari menu Catat."):rwEmpty("🗂","Belum ada yang cocok","Tidak ada transaksi "+esc(katLabel())+" di "+blnFmt(S.bulan)+". Coba filter lain atau ganti bulan."));
   return b+rowsGrp(l);
 }
 function formAc(){var f=S.ac,lbl={bayar:"Catat pembayaran",terima:"Catat diterima",setor:"Setor",tarik:"Tarik",nilai:"Update nilai"}[f.k];
@@ -643,6 +649,7 @@ function extra(a,v,t){
   case "rd_fmt":S.rdFmt=v;S.rd.fmt=v;S.rd.msg="";render();return true;
   case "rd_go":dlRiwayat();return true;
   case "akun2":S.akunTo=v;render();return true;
+  case "fj":S.fJenis=v;S.fKat="semua";S.katOpen=false;if(S.rd)S.rd.msg="";render();return true;
   case "fkat":S.fKat=v;S.katOpen=false;if(S.rd)S.rd.msg="";render();return true;
   case "kat_t":S.katOpen=!S.katOpen;render();return true;
   case "grp_t":S.hide[v]=!S.hide[v];render();return true;
