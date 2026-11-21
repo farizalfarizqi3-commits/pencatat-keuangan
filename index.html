@@ -271,8 +271,8 @@ function loadLib(src,ok){return new Promise(function(res,rej){if(ok())return res
 function loadPdf(){return loadLib("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",function(){return window.jspdf&&window.jspdf.jsPDF}).then(function(){return loadLib("https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js",function(){return window.jspdf&&window.jspdf.jsPDF&&window.jspdf.jsPDF.API&&window.jspdf.jsPDF.API.autoTable})})}
 function pdfTxt(x){return String(x==null?"":x).replace(/→/g,"->").replace(/−/g,"-").replace(/[^\x20-\xFF]/g,"")}
 function newPdf(land){return new window.jspdf.jsPDF({orientation:land?"landscape":"portrait",unit:"pt",format:"a4"})}
-function pdfFoot(doc){var n=doc.getNumberOfPages(),w=doc.internal.pageSize.getWidth(),h=doc.internal.pageSize.getHeight();for(var i=1;i<=n;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(120);doc.text("Halaman "+i+" dari "+n,w-40,h-20,{align:"right"})}}
-function xlsRiwayat(l,kat,f,inn,ot){
+function pdfFoot(doc){var n=doc.getNumberOfPages(),w=doc.internal.pageSize.getWidth(),h=doc.internal.pageSize.getHeight();for(var i=1;i<=n;i++){doc.setPage(i);doc.setFont("helvetica","normal");doc.setFontSize(8);doc.setTextColor(130);doc.text("Pencatat Keuangan  ·  dibuat "+pdfTxt(tglFmt(today())),40,h-20);doc.text("Halaman "+i+" dari "+n,w-40,h-20,{align:"right"})}}
+function xlsRiwayatPlain(l,kat,f,inn,ot){
   var H=["Tanggal","Jenis","Akun","Kategori","Nominal","Keterangan","Sumber"];
   var rows=l.map(function(t){return{"Tanggal":t.tgl,"Jenis":jenisTxt(t),"Akun":t.akun,"Kategori":t.kat,"Nominal":t.nom,"Keterangan":t.ket,"Sumber":t.src?SRCL[t.src]:"Harian"}});
   var ring=[{"Keterangan":"Kategori","Nilai":kat},{"Keterangan":"Dari tanggal","Nilai":f.from},{"Keterangan":"Sampai tanggal","Nilai":f.to},{"Keterangan":"Jumlah transaksi","Nilai":l.length},{"Keterangan":"Total pemasukan","Nilai":inn},{"Keterangan":"Total pengeluaran","Nilai":ot},{"Keterangan":"Selisih","Nilai":inn-ot}];
@@ -282,7 +282,7 @@ function xlsRiwayat(l,kat,f,inn,ot){
   var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,w1,"Riwayat");XLSX.utils.book_append_sheet(wb,w2,"Ringkasan");
   return new Blob([XLSX.write(wb,{bookType:"xlsx",type:"array"})],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
 }
-function pdfRiwayat(l,kat,f,inn,ot){
+function pdfRiwayatPlain(l,kat,f,inn,ot){
   var doc=newPdf(false);
   doc.setFontSize(15);doc.setTextColor(24,95,165);doc.text("Riwayat transaksi",40,46);
   doc.setFontSize(9);doc.setTextColor(60);
@@ -297,6 +297,85 @@ function pdfRiwayat(l,kat,f,inn,ot){
     didParseCell:function(d){if(d.section==="body"&&d.column.index===4){var c=String(d.cell.raw).charAt(0);if(c==="-")d.cell.styles.textColor=[163,45,45];else if(c==="+")d.cell.styles.textColor=[59,109,17]}}});
   pdfFoot(doc);return doc.output("blob");
 }
+function loadExcelJs(){return loadLib("https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js",function(){return window.ExcelJS})}
+function dUtc(s){var p=String(s).split("-");return new Date(Date.UTC(+p[0],+p[1]-1,+p[2]))}
+function xlsRiwayat(l,kat,f,inn,ot){
+  return loadExcelJs().then(function(){
+    var BL="FF185FA5",SOFT="FFF4F7FB",LINE="FFDCE6F2",GR="FF3B6D11",RD="FFA32D2D",MU="FF5F5E5A",WH="FFFFFFFF";
+    var fill=function(a){return{type:"pattern",pattern:"solid",fgColor:{argb:a}}};
+    var wb=new ExcelJS.Workbook();wb.creator="Pencatat Keuangan";wb.created=new Date();
+    var ws=wb.addWorksheet("Riwayat",{views:[{state:"frozen",ySplit:7,showGridLines:false}],pageSetup:{paperSize:9,orientation:"portrait",fitToPage:true,fitToWidth:1,fitToHeight:0}});
+    ws.columns=[{width:14},{width:13},{width:18},{width:13},{width:42},{width:17}];
+    ws.mergeCells("A1:F1");var c=ws.getCell("A1");c.value="Riwayat Transaksi";c.font={name:"Calibri",size:20,bold:true,color:{argb:WH}};c.fill=fill(BL);c.alignment={vertical:"middle",indent:1};ws.getRow(1).height=38;
+    ws.mergeCells("A2:F2");c=ws.getCell("A2");c.value="Periode "+tglFmt(f.from)+" sampai "+tglFmt(f.to)+"   ·   "+kat+"   ·   "+l.length+" transaksi";c.font={name:"Calibri",size:10,color:{argb:"FFDCEBFA"}};c.fill=fill(BL);c.alignment={vertical:"middle",indent:1};ws.getRow(2).height=22;
+    ws.getRow(3).height=10;
+    var net=inn-ot,cards=[["A4:B4","A5:B5","Total masuk",inn,GR,'"Rp" #,##0'],["C4:D4","C5:D5","Total keluar",ot,RD,'"Rp" #,##0'],["E4:F4","E5:F5","Selisih",net,net<0?RD:BL,'"Rp" #,##0;-"Rp" #,##0']];
+    cards.forEach(function(k,i){
+      ws.mergeCells(k[0]);ws.mergeCells(k[1]);
+      var a=ws.getCell(k[0].split(":")[0]),b=ws.getCell(k[1].split(":")[0]),edge={left:{style:"thick",color:{argb:WH}}};
+      a.value=k[2];a.font={name:"Calibri",size:10,color:{argb:MU}};a.fill=fill(SOFT);a.alignment={vertical:"bottom",indent:1};a.border=i?edge:{};
+      b.value=k[3];b.numFmt=k[5];b.font={name:"Calibri",size:16,bold:true,color:{argb:k[4]}};b.fill=fill(SOFT);b.alignment={vertical:"middle",horizontal:"left",indent:1};b.border=i?edge:{};
+    });
+    ws.getRow(4).height=22;ws.getRow(5).height=30;ws.getRow(6).height=12;
+    var hr=ws.getRow(7);hr.values=["Tanggal","Jenis","Kategori","Akun","Keterangan","Nominal (Rp)"];hr.height=26;
+    hr.eachCell(function(cell,n){cell.font={name:"Calibri",size:11,bold:true,color:{argb:WH}};cell.fill=fill(BL);cell.alignment={vertical:"middle",horizontal:n===6?"right":"left",indent:1}});
+    l.forEach(function(t,i){
+      var tf=t.src==="transfer",o=t.jenis==="out",col=tf?MU:o?RD:GR,r=ws.addRow([dUtc(t.tgl),jenisTxt(t),t.kat,t.akun,t.ket||"",tf?t.nom:(o?-t.nom:t.nom)]);
+      r.height=22;
+      r.eachCell({includeEmpty:true},function(cell,n){
+        cell.font={name:"Calibri",size:10.5,color:{argb:n===2||n===6?col:"FF2C2C2A"},bold:n===2||n===6||n===3};
+        if(i%2)cell.fill=fill("FFF7FAFD");
+        cell.border={bottom:{style:"thin",color:{argb:LINE}}};
+        cell.alignment={vertical:"middle",horizontal:n===6?"right":"left",indent:1,wrapText:n===5};
+      });
+      r.getCell(1).numFmt="dd mmm yyyy";r.getCell(6).numFmt='#,##0;-#,##0;0';
+    });
+    ws.autoFilter="A7:F"+(7+l.length);
+    var g={};l.forEach(function(t){if(t.src==="transfer")return;var k=t.jenis+"|"+t.kat;g[k]=g[k]||{j:t.jenis,k:t.kat,n:0,v:0};g[k].n++;g[k].v+=t.nom});
+    var arr=Object.keys(g).map(function(k){return g[k]}).sort(function(a,b){return a.j===b.j?b.v-a.v:(a.j==="out"?-1:1)});
+    if(arr.length){
+      var w2=wb.addWorksheet("Per kategori",{views:[{showGridLines:false}]});
+      w2.columns=[{width:24},{width:14},{width:12},{width:18},{width:10}];
+      w2.mergeCells("A1:E1");var t1=w2.getCell("A1");t1.value="Ringkasan per kategori";t1.font={name:"Calibri",size:16,bold:true,color:{argb:WH}};t1.fill=fill(BL);t1.alignment={vertical:"middle",indent:1};w2.getRow(1).height=34;
+      var h2=w2.getRow(3);h2.values=["Kategori","Jenis","Transaksi","Total (Rp)","Porsi"];h2.height=24;
+      h2.eachCell(function(cell,n){cell.font={name:"Calibri",size:11,bold:true,color:{argb:WH}};cell.fill=fill(BL);cell.alignment={vertical:"middle",horizontal:n>=3?"right":"left",indent:1}});
+      arr.forEach(function(x,i){
+        var tot=x.j==="out"?ot:inn,o=x.j==="out",r=w2.addRow([x.k,o?"Pengeluaran":"Pemasukan",x.n,x.v,tot?x.v/tot:0]);r.height=22;
+        r.eachCell({includeEmpty:true},function(cell,n){cell.font={name:"Calibri",size:10.5,bold:n===1||n===4,color:{argb:n===2||n===4?(o?RD:GR):"FF2C2C2A"}};if(i%2)cell.fill=fill("FFF7FAFD");cell.border={bottom:{style:"thin",color:{argb:LINE}}};cell.alignment={vertical:"middle",horizontal:n>=3?"right":"left",indent:1}});
+        r.getCell(4).numFmt="#,##0";r.getCell(5).numFmt="0%";
+      });
+    }
+    return wb.xlsx.writeBuffer().then(function(buf){return new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})});
+  });
+}
+function pdfRiwayat(l,kat,f,inn,ot){
+  var doc=newPdf(false),W=doc.internal.pageSize.getWidth(),M=40,CW=W-2*M,tg=function(x){return pdfTxt(tglFmt(x))},net=inn-ot;
+  doc.setFillColor(24,95,165);doc.rect(0,0,W,96,"F");
+  doc.setFont("helvetica","bold");doc.setFontSize(21);doc.setTextColor(255,255,255);doc.text("Riwayat Transaksi",M,46);
+  doc.setFont("helvetica","normal");doc.setFontSize(9.5);doc.setTextColor(200,222,245);
+  doc.text(tg(f.from)+" sampai "+tg(f.to),M,65);doc.text(pdfTxt(kat+"   ·   "+l.length+" transaksi"),M,79);
+  var gap=10,cw=(CW-2*gap)/3,cy=112,GRN=[59,109,17],RED=[163,45,45],BLU=[24,95,165];
+  [["Total masuk",rp(inn),GRN],["Total keluar",rp(ot),RED],["Selisih",(net<0?"-":"")+rp(Math.abs(net)),net<0?RED:BLU]].forEach(function(c,i){
+    var x=M+i*(cw+gap);doc.setFillColor(244,247,251);doc.roundedRect(x,cy,cw,54,9,9,"F");
+    doc.setFillColor(c[2][0],c[2][1],c[2][2]);doc.circle(x+15,cy+17,3,"F");
+    doc.setFont("helvetica","normal");doc.setFontSize(8.5);doc.setTextColor(95,94,90);doc.text(c[0],x+24,cy+20);
+    doc.setFont("helvetica","bold");doc.setFontSize(13);doc.setTextColor(c[2][0],c[2][1],c[2][2]);doc.text(pdfTxt(c[1]),x+15,cy+42);
+  });
+  var body=[],i=0,pad={top:5,bottom:5,left:6,right:6};
+  while(i<l.length){
+    var d=l[i].tgl,g=[];while(i<l.length&&l[i].tgl===d){g.push(l[i]);i++}
+    var real=g.filter(function(t){return t.src!=="transfer"}),go=sum(real,"out"),gi=sum(real,"in");
+    var lab=new Date(d+"T00:00").toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+(gi?"      Masuk "+rp(gi):"")+(go?"      Keluar "+rp(go):"");
+    body.push([{content:pdfTxt(lab),colSpan:4,styles:{fillColor:[230,241,251],textColor:[12,68,124],fontStyle:"bold",fontSize:8.5,cellPadding:{top:6,bottom:6,left:6,right:6}}}]);
+    g.forEach(function(t){var tf=t.src==="transfer",o=t.jenis==="out",col=tf?[95,94,90]:o?RED:GRN;
+      body.push([{content:pdfTxt(t.kat),styles:{fontStyle:"bold"}},pdfTxt(t.akun),{content:pdfTxt(t.ket),styles:{textColor:[95,94,90]}},{content:(tf?"":o?"-":"+")+rp(t.nom),styles:{halign:"right",fontStyle:"bold",textColor:col}}])});
+  }
+  doc.autoTable({startY:cy+54+20,head:[["Kategori","Akun","Keterangan","Nominal"]],body:body,theme:"plain",
+    styles:{fontSize:8.5,cellPadding:pad,textColor:[44,44,42],lineColor:[225,232,242],lineWidth:{bottom:0.5},overflow:"linebreak",valign:"middle"},
+    headStyles:{fillColor:[24,95,165],textColor:[255,255,255],fontStyle:"bold",lineWidth:0},
+    columnStyles:{0:{cellWidth:95},1:{cellWidth:70},3:{cellWidth:92,halign:"right"}},margin:{left:M,right:M,top:40,bottom:46}});
+  pdfFoot(doc);return doc.output("blob");
+}
 function dlRiwayat(){
   var f=S.rd;if(!f||f.busy)return;
   if(!/^\d{4}-\d{2}-\d{2}$/.test(f.from)||!/^\d{4}-\d{2}-\d{2}$/.test(f.to)){f.ok=false;f.msg="Isi tanggal awal dan akhir dulu.";render();return}
@@ -305,7 +384,7 @@ function dlRiwayat(){
   if(!l.length){f.ok=false;f.msg="Tidak ada transaksi pada rentang ini untuk pilihan "+katLabel()+".";render();return}
   var kat=katLabel(),inn=sum(l,"in"),ot=sum(l,"out"),name="Riwayat-"+(isFilt()?slug(katLabel()):"Semua")+"-"+f.from+"_sd_"+f.to,ext=f.fmt==="pdf"?"pdf":"xlsx";
   f.busy=true;f.msg="";render();
-  (ext==="pdf"?loadPdf().then(function(){return pdfRiwayat(l,kat,f,inn,ot)}):loadXlsx().then(function(){return xlsRiwayat(l,kat,f,inn,ot)}))
+  (ext==="pdf"?loadPdf().then(function(){try{return pdfRiwayat(l,kat,f,inn,ot)}catch(e){return pdfRiwayatPlain(l,kat,f,inn,ot)}}):xlsRiwayat(l,kat,f,inn,ot).catch(function(){return loadXlsx().then(function(){return xlsRiwayatPlain(l,kat,f,inn,ot)})}))
   .then(function(blob){saveBlob(blob,name+"."+ext);f.ok=true;f.msg="File "+name+"."+ext+" ("+l.length+" transaksi) dikirim ke folder Unduhan perangkat ini."})
   .catch(function(){f.ok=false;f.msg="Gagal membuat file. Periksa koneksi, lalu coba lagi atau pilih format lain."})
   .then(function(){f.busy=false;render()});
