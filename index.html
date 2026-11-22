@@ -532,7 +532,8 @@ function vRestore(){var k=S.bk,b='<div class="lab">Pulihkan dari cadangan</div><
     if(!k.list.length)b+='<div class="note">Belum ada cadangan di Drive. Buat dulu lewat tombol Cadangkan sekarang.</div>';
     else{b+='<div class="bklist">'+k.list.map(function(x){return '<button class="bkit'+(k.sel===x.id?" on":"")+'" data-a="bk_sel" data-v="'+esc(x.id)+'"><span class="bkd">'+esc(x.date)+'</span><small>'+esc(x.name)+'</small><i>'+(k.sel===x.id?"✓":"")+'</i></button>'}).join("")+'</div>';
       if(k.sel)b+='<div class="chips" style="margin-top:12px"><button class="chip'+(k.pre?" on":"")+'" data-a="bk_pre">Cadangkan data sekarang dulu</button></div><div class="note" style="margin-top:8px">Disarankan aktif. Transaksi yang dicatat setelah tanggal cadangan terpilih akan hilang dari aplikasi, tetapi tetap aman di cadangan baru itu.</div><div class="lab">Masukkan PIN untuk konfirmasi</div>'+pw("bpin","PIN")+'<button class="btn dg" id="bkb" data-a="bk_go">'+(k.ask?"Ketuk lagi untuk memulihkan":"Pulihkan data")+'</button>'}}
-  return b+'<div class="'+(k.err?"err2":"ok")+'" id="bkmsg" style="text-align:left">'+esc(k.err||k.msg)+'</div></div>'}
+  return b+'<div class="'+(k.err?"err2":"ok")+'" id="bkmsg" style="text-align:left">'+esc(k.err||k.msg)+'</div>'+(k.list?'<button class="btn sec" data-a="bk_cancel">Batal</button>':"")+'</div>'}
+function bkReset(){S.bk={list:null,loading:false,sel:"",pre:true,ask:false,msg:"",err:""}}
 function applyRestore(d){S.tx=d.tx||[];S.utang=d.utang||[];S.aset=d.aset||[];S.log=d.log||[];
   if(d.cfg&&d.cfg.out&&d.cfg.in){KAT.out=d.cfg.out.slice(0,LIM.out);KAT.in=d.cfg.in.slice(0,LIM.in);if(d.cfg.akun&&d.cfg.akun.length)KAT.akun=d.cfg.akun.slice(0,LIM.akun)}else KAT=JSON.parse(JSON.stringify(KAT0));
   S.fu=null;S.fa=null;S.ac=null;S.open={};S.del=null;fixKat()}
@@ -879,6 +880,7 @@ function extra(a,v,t){
     return true;
   case "bk_list":{var bk=S.bk;if(bk.loading)return true;bk.loading=true;bk.err="";bk.msg="";bk.ask=false;render();
     call("api_listBackups").then(function(r){bk.list=(r&&r.list)||[];if(bk.sel&&!bk.list.some(function(x){return x.id===bk.sel}))bk.sel=""}).catch(function(e){bk.err=msg(e)}).then(function(){bk.loading=false;render()});return true}
+  case "bk_cancel":bkReset();render();return true;
   case "bk_sel":S.bk.sel=v;S.bk.ask=false;S.bk.err="";S.bk.msg="";render();return true;
   case "bk_pre":S.bk.pre=!S.bk.pre;S.bk.ask=false;render();return true;
   case "bk_go":{var bg=S.bk,bp=(document.getElementById("bpin")||{}).value||"";
@@ -896,7 +898,7 @@ function extra(a,v,t){
     return true}
   case "u_filt":S.fU=v;render();return true;
   case "a_filt":S.fA=v;render();return true;
-  case "atur":S.prev=PENG[S.tab]?S.prev:S.tab;S.tab="setelan";S.del=null;S.kmsg="";render();window.scrollTo(0,0);return true;
+  case "atur":bkReset();S.prev=PENG[S.tab]?S.prev:S.tab;S.tab="setelan";S.del=null;S.kmsg="";render();window.scrollTo(0,0);return true;
   case "day":S.selDay=S.selDay===v?"":v;render();return true;
   case "lk":S[v].link=!S[v].link;render();return true;
   case "lkp":S[v].lkOpen=!S[v].lkOpen;render();return true;
@@ -955,7 +957,7 @@ function render(){
   navEl.parentNode.style.display="";
   navEl.innerHTML=T.map(function(t){return '<button class="'+(S.tab===t[0]?"on":"")+'" data-t="'+t[0]+'"><b>'+t[1]+'</b>'+t[2]+'</button>'}).join("");
 }
-navEl.onclick=function(e){var t=e.target.closest("[data-t]");if(!t)return;if(S.tab==="kelola"&&t.dataset.t!=="kelola"){if(dupBad()){S.kmsg="Nama tidak boleh kosong atau kembar dalam satu daftar.";render();return}["akun","out","in"].forEach(function(j){KAT[j].forEach(function(k){k.n=k.n.trim()})});saveCfg()}S.tab=t.dataset.t;S.del=null;S.rsAsk=false;S.rmsg="";S.orAsk=false;fixKat();S.msg="";S.err="";render();window.scrollTo(0,0)};
+navEl.onclick=function(e){var t=e.target.closest("[data-t]");if(!t)return;bkReset();if(S.tab==="kelola"&&t.dataset.t!=="kelola"){if(dupBad()){S.kmsg="Nama tidak boleh kosong atau kembar dalam satu daftar.";render();return}["akun","out","in"].forEach(function(j){KAT[j].forEach(function(k){k.n=k.n.trim()})});saveCfg()}S.tab=t.dataset.t;S.del=null;S.rsAsk=false;S.rmsg="";S.orAsk=false;fixKat();S.msg="";S.err="";render();window.scrollTo(0,0)};
 app.oninput=function(e){
   if(e.target.dataset.c){var p=e.target.dataset.c.split("|"),k=KAT[p[0]][Number(p[1])];if(!k)return;if(p[2]==="b"){var d=e.target.value.replace(/\D/g,"").slice(0,12);e.target.value=d?Number(d).toLocaleString("id-ID"):"";k.b=Number(d)||0}else if(p[2]==="n")k.n=e.target.value;else k.i=e.target.value;saveCfg();return}
   if(xinput(e))return;var id=e.target.id;
@@ -991,7 +993,7 @@ app.onclick=function(e){
   else if(a==="lock"){PIN="";S.rem=false;S.auth=false;S.tx=[];S.utang=[];S.aset=[];S.log=[];try{localStorage.removeItem("pk_pin")}catch(x){}render()}
   else if(a==="addkat"){if(KAT[v].length>=LIM[v]){S.kmsg="Batas "+LIM[v]+" sudah tercapai.";render();return}KAT[v].push({n:"Baru",i:v==="akun"?"":"•",b:0});S.kmsg="";fixKat();saveCfg();render()}
   else if(a==="kelola"){if(S.tab!=="kelola")S.prev=S.tab;S.tab="kelola";S.del=null;S.kmsg="";render();window.scrollTo(0,0)}
-  else if(a==="tutup"){if(dupBad()){S.kmsg="Nama tidak boleh kosong atau kembar dalam satu daftar.";render();return}["akun","out","in"].forEach(function(j){KAT[j].forEach(function(k){k.n=k.n.trim()})});saveCfg();S.tab=S.prev||"catat";S.del=null;S.kmsg="";fixKat();render();window.scrollTo(0,0)}
+  else if(a==="tutup"){if(dupBad()){S.kmsg="Nama tidak boleh kosong atau kembar dalam satu daftar.";render();return}["akun","out","in"].forEach(function(j){KAT[j].forEach(function(k){k.n=k.n.trim()})});saveCfg();bkReset();S.tab=S.prev||"catat";S.del=null;S.kmsg="";fixKat();render();window.scrollTo(0,0)}
   else if(a==="delkat"){if(S.del===v){var p=v.split("|");if(p[0]==="akun"&&KAT.akun.length<=1){S.del=null;S.kmsg="Minimal harus ada satu akun.";render();return}KAT[p[0]].splice(Number(p[1]),1);S.del=null;S.kmsg="";fixKat();saveCfg();render()}else{S.del=v;S.kmsg="";render()}}
 };
 function simpan(){if(S.jenis==="tf")return simpanTf();
