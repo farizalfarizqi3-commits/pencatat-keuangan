@@ -107,6 +107,7 @@ nav button.on{background:var(--soft);color:var(--fg);font-weight:600}
 .err2{min-height:20px;color:var(--out);font-size:14px;margin-top:10px}
 .pw{position:relative}.pw .in{padding-right:46px}
 .eye{position:absolute;right:4px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--mut);cursor:pointer;padding:9px;display:flex}
+.in.cd{text-align:center;letter-spacing:8px;font-size:22px;font-weight:700}
 .lnk{background:none;border:0;color:var(--b);font:inherit;font-size:14px;cursor:pointer;margin-top:16px;text-decoration:underline}
 @media (min-width:520px){body{background:var(--desk)}#app{background:var(--bg);min-height:100vh;box-shadow:0 0 0 1px var(--bl)}}
 .topbtn{display:flex;align-items:center;gap:6px;border:0;background:var(--hdglass);color:var(--hdtxt);border-radius:999px;padding:7px 13px;font:inherit;font-size:13px;font-weight:500;cursor:pointer}
@@ -264,22 +265,34 @@ function themeMeta(){var r=document.documentElement,t=r.getAttribute("data-theme
 function setTema(v){try{if(v==="light"||v==="dark")localStorage.setItem("pk_tema",v);else localStorage.removeItem("pk_tema")}catch(e){}var r=document.documentElement;if(v==="light"||v==="dark")r.setAttribute("data-theme",v);else r.removeAttribute("data-theme");themeMeta()}
 function pad(n){return n<10?"0"+n:""+n}
 function today(){var d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
-var S={fJenis:"semua",katOpen:false,rd:null,rdFmt:"xlsx",dlFmt:"xlsx",fKat:"semua",akunTo:"",fee:"",log:[],qR:"",qU:"",qA:"",open:{},ac:null,dl:"",dlBusy:false,fU:"semua",fA:"semua",utang:[],aset:[],fu:null,fa:null,pay:"",act:null,ferr:"",selDay:today(),email:"muhammadalfarizqi13@gmail.com",forgot:false,auth:false,loading:false,pinErr:"",rem:false,autoDay:1,rsBk:true,rsAsk:false,rmsg:"",orAsk:false,omsg:"",hide:{u_lunas:true,a_tercapai:true},auto:false,last:"",busy:"",bmsg:"",pmsg:"",tx:[],jenis:"out",akun:"Cash",kat:"Makan",nom:"",ket:"",tgl:today(),tab:"catat",bulan:today().slice(0,7),del:null,dbErr:false,msg:"",err:""};
+var S={fJenis:"semua",katOpen:false,rd:null,rdFmt:"xlsx",dlFmt:"xlsx",fKat:"semua",akunTo:"",fee:"",log:[],qR:"",qU:"",qA:"",open:{},ac:null,dl:"",dlBusy:false,fU:"semua",fA:"semua",utang:[],aset:[],fu:null,fa:null,pay:"",act:null,ferr:"",selDay:today(),fp:{step:"email",email:"",err:"",busy:false,hint:""},forgot:false,auth:false,loading:false,pinErr:"",rem:false,autoDay:1,rsBk:true,rsAsk:false,rmsg:"",orAsk:false,omsg:"",hide:{u_lunas:true,a_tercapai:true},auto:false,last:"",busy:"",bmsg:"",pmsg:"",tx:[],jenis:"out",akun:"Cash",kat:"Makan",nom:"",ket:"",tgl:today(),tab:"catat",bulan:today().slice(0,7),del:null,dbErr:false,msg:"",err:""};
 var EYE='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 var EYEOFF='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.1 6.1C3.6 7.8 2 12 2 12s3.6 7 10 7c1.7 0 3.2-.4 4.5-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
 function pw(id,ph,extra){return '<div class="pw"><input class="in'+(extra||"")+'" id="'+id+'" type="password" inputmode="numeric" maxlength="12" placeholder="'+ph+'" autocomplete="off"><button class="eye" type="button" data-a="eye" data-v="'+id+'" aria-label="Tampilkan PIN">'+EYE+'</button></div>'}
-function mailLinks(){var s=encodeURIComponent("Lupa PIN Pencatat Keuangan"),b=encodeURIComponent("Halo, saya lupa PIN aplikasi Pencatat Keuangan. Mohon bantu reset PIN.");return{m:"mailto:"+S.email+"?subject="+s+"&body="+b,g:"https://mail.google.com/mail/?view=cm&to="+encodeURIComponent(S.email)+"&su="+s+"&body="+b}}
-function vForgot(){var l=mailLinks();return '<div class="pinbox"><div class="ttl2">Lupa PIN</div><p style="line-height:1.6">Silakan kirim pesan lupa password ke email<br><b>'+esc(S.email)+'</b></p><a class="btn" style="text-decoration:none;box-sizing:border-box" href="'+esc(l.m)+'" target="_blank" rel="noopener">Buka aplikasi email</a><a class="btn sec" style="text-decoration:none;box-sizing:border-box" href="'+esc(l.g)+'" target="_blank" rel="noopener">Buka Gmail di tab baru</a><button class="lnk" data-a="back">Kembali</button></div>'}
+function vForgot(){var f=S.fp,b='<div class="pinbox"><div class="ic" style="width:64px;height:64px;font-size:30px;margin:0 auto 16px">✉️</div><div class="ttl2">Lupa PIN</div>';
+  if(f.step==="email")b+='<p style="line-height:1.6;margin-top:0">Masukkan <b>email pribadi pemilik aplikasi</b>'+(f.hint?' <span style="color:var(--mut)">('+esc(f.hint)+')</span>':'')+'. Kami kirim kode unik ke email itu untuk konfirmasi.</p><input class="in" id="fp_email" type="email" inputmode="email" autocomplete="email" placeholder="email@contoh.com" value="'+esc(f.email)+'"><div class="err2">'+esc(f.err)+'</div><button class="btn" data-a="fp_send">'+(f.busy?"Mengirim…":"Kirim kode")+'</button><button class="lnk" data-a="back">Kembali</button>';
+  else if(f.step==="code")b+='<p style="line-height:1.6;margin-top:0">Jika email cocok, kode 6 angka sudah dikirim ke <b>'+esc(f.email)+'</b>. Kode berlaku 10 menit. Cek juga folder spam.</p><input class="in cd" id="fp_code" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••"><div class="err2">'+esc(f.err)+'</div><button class="btn" data-a="fp_verify">'+(f.busy?"Memeriksa…":"Konfirmasi dan kirim PIN")+'</button><button class="lnk" data-a="fp_resend">Kirim ulang kode</button><br><button class="lnk" data-a="back">Kembali</button>';
+  else b+='<p style="line-height:1.6;margin-top:0">✅ PIN lama sudah dikirim ke <b>'+esc(f.email)+'</b>.</p><div class="hint" style="text-align:left;line-height:1.6"><b>Saran:</b> setelah masuk, segera ubah PIN lewat Pengaturan, lalu Keamanan, lalu Ubah PIN. Pilih PIN baru yang sulit ditebak dan hapus email berisi PIN lama.</div><button class="btn" data-a="back">Kembali ke halaman masuk</button>';
+  return b+'</div>'}
+function fpSend(){var f=S.fp;if(f.busy)return;var el=document.getElementById("fp_email");if(el)f.email=el.value.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)){f.err="Isi email yang benar.";render();return}
+  f.busy=true;f.err="";render();
+  call("api_forgotRequest",f.email).then(function(){f.step="code"}).catch(function(e){f.err=msg(e)}).then(function(){f.busy=false;render()})}
+function fpVerify(){var f=S.fp;if(f.busy)return;var el=document.getElementById("fp_code"),c=el?el.value.replace(/\D/g,""):"";
+  if(c.length!==6){f.err="Isi 6 angka kode.";render();return}
+  f.busy=true;f.err="";render();
+  call("api_forgotVerify",f.email,c).then(function(){f.step="done"}).catch(function(e){f.err=msg(e)}).then(function(){f.busy=false;render()})}
 var PIN="";
+var NOAUTH={api_info:1,api_forgotRequest:1,api_forgotVerify:1};
 var API_URL=window.API_URL||"";
 function call(fn){var a=[].slice.call(arguments,1);
   if(API_URL){
     if(API_URL.indexOf("https://")!==0)return Promise.reject(new Error("NOURL"));
-    return fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({fn:fn,args:fn==="api_info"?[]:[PIN].concat(a)})}).then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.error);return j.data});
+    return fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({fn:fn,args:NOAUTH[fn]?a:[PIN].concat(a)})}).then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.error);return j.data});
   }
   if(!(window.google&&google.script&&google.script.run))return Promise.reject(new Error("NOURL"));
-  return new Promise(function(res,rej){google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn].apply(null,[PIN].concat(a))})}
-function msg(e){var m=(e&&e.message)||"";if(m.indexOf("BADPIN")>=0)return "PIN salah.";if(m.indexOf("LOCKED")>=0)return "Terlalu banyak percobaan. Coba lagi 10 menit lagi.";if(m.indexOf("NOURL")>=0)return "Alamat Apps Script belum diisi di index.html.";if(m.indexOf("NOPIN")>=0)return "PIN belum diatur di Apps Script. Lihat panduan.";return "Tidak bisa terhubung ke server. Coba lagi."}
+  return new Promise(function(res,rej){google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn].apply(null,NOAUTH[fn]?a:[PIN].concat(a))})}
+function msg(e){var m=(e&&e.message)||"";if(m.indexOf("BADPIN")>=0)return "PIN salah.";if(m.indexOf("BADCODE")>=0)return "Kode salah. Periksa lagi kode di emailmu.";if(m.indexOf("CODEEXP")>=0)return "Kode sudah kedaluwarsa. Minta kode baru.";if(m.indexOf("TOOMANY")>=0)return "Terlalu sering meminta kode. Coba lagi satu jam lagi.";if(m.indexOf("WAIT")>=0)return "Tunggu 1 menit sebelum meminta kode lagi.";if(m.indexOf("MAILFAIL")>=0)return "Email gagal dikirim. Pemilik perlu menjalankan fungsi setup di Apps Script untuk memberi izin email.";if(m.indexOf("DATA")>=0)return "Data tidak valid. Periksa email yang diisi.";if(m.indexOf("LOCKED")>=0)return "Terlalu banyak percobaan. Coba lagi 10 menit lagi.";if(m.indexOf("NOURL")>=0)return "Alamat Apps Script belum diisi di index.html.";if(m.indexOf("NOPIN")>=0)return "PIN belum diatur di Apps Script. Lihat panduan.";return "Tidak bisa terhubung ke server. Coba lagi."}
 function vPin(){return '<div class="pinbox"><div class="ic" style="width:64px;height:64px;font-size:30px;margin:0 auto 16px">🔒</div><div class="ttl2">Pencatat Keuangan</div>'+pw("pin","PIN"," pin")+'<label class="rem"><input type="checkbox" id="rem" '+(S.rem?"checked":"")+'> Ingat PIN di perangkat ini</label><div class="err2">'+esc(S.pinErr)+'</div><button class="btn" data-a="login">'+(S.loading?"Memeriksa…":"Masuk")+'</button><button class="lnk" data-a="forgot">Lupa PIN?</button></div>'}
 function doLogin(silent){
   S.loading=true;S.pinErr="";render();
@@ -928,7 +941,7 @@ app.oninput=function(e){
   else if(id==="tgl"&&e.target.value)S.tgl=e.target.value;
   else if(id==="bln"&&e.target.value){S.bulan=e.target.value;S.selDay="";if(S.rd){S.rd.from=S.bulan+"-01";S.rd.to=lastDay(S.bulan);S.rd.msg=""}render()}
 };
-app.onkeydown=function(e){if(e.key==="Enter"&&e.target.id==="pin"){PIN=e.target.value;S.rem=!!(document.getElementById("rem")||{}).checked;if(PIN)doLogin()}};
+app.onkeydown=function(e){if(e.key==="Enter"&&e.target.id==="fp_email"){fpSend();return}if(e.key==="Enter"&&e.target.id==="fp_code"){fpVerify();return}if(e.key==="Enter"&&e.target.id==="pin"){PIN=e.target.value;S.rem=!!(document.getElementById("rem")||{}).checked;if(PIN)doLogin()}};
 app.onclick=function(e){
   var t=e.target.closest("[data-a]");if(!t)return;var a=t.dataset.a,v=t.dataset.v;if(extra(a,v,t))return;
   if(a==="jenis"){S.jenis=v;if(v!=="tf")S.kat=KAT[v].length?KAT[v][0].n:"";S.err="";S.msg="";fixKat();render()}
@@ -940,7 +953,9 @@ app.onclick=function(e){
   else if(a==="auto"){var on=v==="1";S.auto=on;S.bmsg="";render();call("api_setAuto",on,S.autoDay).then(function(){S.bmsg=on?"Cadangan otomatis aktif.":"Cadangan otomatis dimatikan.";render()}).catch(function(e){S.auto=!on;S.bmsg=msg(e);render()})}
   else if(a==="backup"){if(S.busy)return;S.busy="backup";S.bmsg="";render();call("api_backup").then(function(r){S.last=r.last;S.bmsg="Tersimpan di folder Drive: "+r.folder+"."}).catch(function(e){S.bmsg=msg(e)}).then(function(){S.busy="";render()})}
   else if(a==="eye"){var ip=document.getElementById(v),show=ip.type==="password";ip.type=show?"text":"password";t.innerHTML=show?EYEOFF:EYE;t.setAttribute("aria-label",show?"Sembunyikan PIN":"Tampilkan PIN")}
-  else if(a==="forgot"){S.forgot=true;render();try{window.open(/Android|iPhone|iPad/i.test(navigator.userAgent)?mailLinks().m:mailLinks().g,"_blank")}catch(x){}}
+  else if(a==="forgot"){S.forgot=true;S.fp={step:"email",email:"",err:"",busy:false,hint:S.fp.hint||""};render()}
+  else if(a==="fp_send"||a==="fp_resend")fpSend();
+  else if(a==="fp_verify")fpVerify();
   else if(a==="back"){S.forgot=false;render()}
   else if(a==="chpin"){var op=(document.getElementById("opin")||{}).value||"",np=(document.getElementById("npin")||{}).value||"",np2=(document.getElementById("npin2")||{}).value||"";
     if(!op){S.pmsg="Isi PIN lama dulu.";render();return}
@@ -977,6 +992,6 @@ function hapus(id){
 render();
 themeMeta();try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",themeMeta)}catch(e){}
 try{var sp=localStorage.getItem("pk_pin");if(sp){PIN=sp;S.rem=true;doLogin(true)}}catch(x){}
-call("api_info").then(function(r){if(r&&r.email){S.email=r.email;if(S.forgot)render()}}).catch(function(){});
+call("api_info").then(function(r){if(r&&r.hint){S.fp.hint=r.hint;if(S.forgot)render()}}).catch(function(){});
 </script>
 </body></html>
